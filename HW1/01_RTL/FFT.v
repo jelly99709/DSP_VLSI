@@ -10,7 +10,7 @@ module FFT(
 	);
 	
 	//parameter declaration
-	parameter DECIMAL = 6;
+	parameter DECIMAL = 10;
 	localparam LENGTH = DECIMAL + 2;
 	integer k;
 
@@ -58,24 +58,24 @@ module FFT(
 	end
 
 	//twiddle factor
-	wire signed [7:0] twf_R [0:15];
-	wire signed [7:0] twf_I [0:15];
-	assign twf_R[0] = 8'sb01000000;   assign twf_I[0] = 8'sb00000000;
-	assign twf_R[1] = 8'sb00111111;   assign twf_I[1] = 8'sb11110100;
-	assign twf_R[2] = 8'sb00111011;   assign twf_I[2] = 8'sb11101000;
-	assign twf_R[3] = 8'sb00110101;   assign twf_I[3] = 8'sb11011100;
-	assign twf_R[4] = 8'sb00101101;   assign twf_I[4] = 8'sb11010011;
-	assign twf_R[5] = 8'sb00100100;   assign twf_I[5] = 8'sb11001011;
-	assign twf_R[6] = 8'sb00011000;   assign twf_I[6] = 8'sb11000101;
-	assign twf_R[7] = 8'sb00001100;   assign twf_I[7] = 8'sb11000001;
-	assign twf_R[8] = 8'sb00000000;   assign twf_I[8] = 8'sb11000000;
-	assign twf_R[9] = 8'sb11110100;   assign twf_I[9] = 8'sb11000001;
-	assign twf_R[10] = 8'sb11101000;   assign twf_I[10] = 8'sb11000101;
-	assign twf_R[11] = 8'sb11011100;   assign twf_I[11] = 8'sb11001011;
-	assign twf_R[12] = 8'sb11010011;   assign twf_I[12] = 8'sb11010011;
-	assign twf_R[13] = 8'sb11001011;   assign twf_I[13] = 8'sb11011100;
-	assign twf_R[14] = 8'sb11000101;   assign twf_I[14] = 8'sb11101000;
-	assign twf_R[15] = 8'sb11000001;   assign twf_I[15] = 8'sb11110100;
+	wire signed [11:0] twf_R [0:15];
+	wire signed [11:0] twf_I [0:15];
+	assign twf_R[0] = 12'sb010000000000;   assign twf_I[0] = 12'sb000000000000;
+	assign twf_R[1] = 12'sb001111101100;   assign twf_I[1] = 12'sb111100111000;
+	assign twf_R[2] = 12'sb001110110010;   assign twf_I[2] = 12'sb111001111000;
+	assign twf_R[3] = 12'sb001101010011;   assign twf_I[3] = 12'sb110111000111;
+	assign twf_R[4] = 12'sb001011010100;   assign twf_I[4] = 12'sb110100101100;
+	assign twf_R[5] = 12'sb001000111001;   assign twf_I[5] = 12'sb110010101101;
+	assign twf_R[6] = 12'sb000110001000;   assign twf_I[6] = 12'sb110001001110;
+	assign twf_R[7] = 12'sb000011001000;   assign twf_I[7] = 12'sb110000010100;
+	assign twf_R[8] = 12'sb000000000000;   assign twf_I[8] = 12'sb110000000000;
+	assign twf_R[9] = 12'sb111100111000;   assign twf_I[9] = 12'sb110000010100;
+	assign twf_R[10] = 12'sb111001111000;   assign twf_I[10] = 12'sb110001001110;
+	assign twf_R[11] = 12'sb110111000111;   assign twf_I[11] = 12'sb110010101101;
+	assign twf_R[12] = 12'sb110100101100;   assign twf_I[12] = 12'sb110100101100;
+	assign twf_R[13] = 12'sb110010101101;   assign twf_I[13] = 12'sb110111000111;
+	assign twf_R[14] = 12'sb110001001110;   assign twf_I[14] = 12'sb111001111000;
+	assign twf_R[15] = 12'sb110000010100;   assign twf_I[15] = 12'sb111100111000;
 
 	//Butterfly stages
 	butterfly #(.DELAY(16), .DECIMAL(DECIMAL)) s1(
@@ -83,15 +83,15 @@ module FFT(
 		.data_R_i(s1_R_in), .data_I_i(s1_I_in), .data_R_o(s1_R_out), .data_I_o(s1_I_out), .valid_i(in_valid)
 		);
 	butterfly #(.DELAY(8), .DECIMAL(DECIMAL)) s2(
-		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s2), .twfR_i(twf_R[{1'd0,cnt_s2[3:0]}]), .twfI_i(twf_I[{1'd0,cnt_s2[3:0]}]),
+		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s2), .twfR_i(twf_R[{cnt_s2[2:0],1'd0}]), .twfI_i(twf_I[{cnt_s2[2:0],1'd0}]),
 		.data_R_i(s1_R_out), .data_I_i(s1_I_out), .data_R_o(s2_R_out), .data_I_o(s2_I_out), .valid_i(in_valid)
 		);
 	butterfly #(.DELAY(4), .DECIMAL(DECIMAL)) s3(
-		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s3), .twfR_i(twf_R[{2'd0,cnt_s3[2:0]}]), .twfI_i(twf_I[{2'd0,cnt_s3[2:0]}]),
+		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s3), .twfR_i(twf_R[{cnt_s3[1:0],2'd0}]), .twfI_i(twf_I[{cnt_s3[1:0],2'd0}]),
 		.data_R_i(s2_R_out), .data_I_i(s2_I_out), .data_R_o(s3_R_out), .data_I_o(s3_I_out), .valid_i(in_valid)
 		);
 	butterfly #(.DELAY(2), .DECIMAL(DECIMAL)) s4(
-		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s4), .twfR_i(twf_R[{3'd0,cnt_s4[1:0]}]), .twfI_i(twf_I[{3'd0,cnt_s4[1:0]}]),
+		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s4), .twfR_i(twf_R[{cnt_s4[0],3'd0}]), .twfI_i(twf_I[{cnt_s4[0],3'd0}]),
 		.data_R_i(s3_R_out), .data_I_i(s3_I_out), .data_R_o(s4_R_out), .data_I_o(s4_I_out), .valid_i(in_valid)
 		);
 	butterfly #(.DELAY(1), .DECIMAL(DECIMAL)) s5(
@@ -204,10 +204,7 @@ module butterfly(
 	wire signed [LENGTH*2+15:0] out_R;
 	wire signed [LENGTH*2+15:0] out_I;
 	wire signed [LENGTH*2+15:0] RR, II, RI, IR;
-	assign RR = prog_R * twfR_i;
-	assign II = prog_I * twfI_i;
-	assign RI = prog_R * twfI_i;
-	assign IR = prog_I * twfR_i;
+	assign RR = prog_R * twfR_i; assign II = prog_I * twfI_i; assign RI = prog_R * twfI_i; assign IR = prog_I * twfR_i;
 	assign out_R = ~upper ? (RR - II) : {{2{prog_R[LENGTH+15]}},prog_R,{DECIMAL{1'b0}}};
 	assign out_I = ~upper ? (RI + IR) : {{2{prog_I[LENGTH+15]}},prog_I,{DECIMAL{1'b0}}};
 
