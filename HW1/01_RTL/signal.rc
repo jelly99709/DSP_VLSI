@@ -1,0 +1,136 @@
+Magic 271485
+Revision Verdi_N-2017.12
+
+; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
+viewPort 0 24 1920 1056 164 65
+
+; File list:
+; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
+openDirFile -d / "" "/home/r07175/DSP_VLSI/HW1/01_RTL/FFT_RTL.fsdb"
+
+; file time scale:
+; fileTimeScale ### s|ms|us|ns|ps
+
+; signal spacing:
+signalSpacing 5
+
+; windowTimeUnit is used for zoom, cursor & marker
+; waveform viewport range
+zoom 62762.829113 79878.947421
+cursor 68500.000000
+marker 0.000000
+
+; user define markers
+; userMarker time_pos marker_name color linestyle
+; visible top row signal index
+top 3
+; marker line index
+markerPos 63
+
+; event list
+; addEvent event_name event_expression
+; curEvent event_name
+
+
+
+COMPLEX_EVENT_BEGIN
+
+
+COMPLEX_EVENT_END
+
+
+
+; toolbar current search type
+; curSTATUS search_type
+curSTATUS ByChange
+
+
+addGroup "G1"
+activeDirFile "" "/home/r07175/DSP_VLSI/HW1/01_RTL/FFT_RTL.fsdb"
+addSignal -h 15 /TESTBED/FFT_CORE/clk
+addSignal -h 15 -holdScope rst_n
+addSignal -h 15 -UNSIGNED -UDEC -holdScope cnt[5:0]
+addSignal -h 15 -UNSIGNED -UDEC -holdScope cnt_s1[4:0]
+addSignal -h 15 -UNSIGNED -UDEC -holdScope cnt_s2[4:0]
+addSignal -h 15 -UNSIGNED -UDEC -holdScope cnt_s3[4:0]
+addSignal -h 15 -UNSIGNED -UDEC -holdScope cnt_s4[4:0]
+addSignal -h 15 -UNSIGNED -UDEC -holdScope cnt_s5[4:0]
+addSignal -h 15 -UNSIGNED -UDEC -holdScope cnt_re[4:0]
+addSignal -h 15 -2COMP -UDEC -holdScope s1_R_in[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope s1_R_out[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope s2_R_out[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope s3_R_out[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope s4_R_out[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope s5_R_out[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope dout_r[15:0]
+addSignal -h 15 -holdScope in_valid
+addSignal -h 15 -holdScope out_valid
+addSignal -h 15 -2COMP -UDEC -holdScope dout_i[15:0]
+addSignal -h 15 -2COMP -UDEC /TESTBED/FFT_CORE/s1/data_R_i[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope delay_R[15][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope data_I_i[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope delay_I[15][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope twfR_i[7:0]
+addSignal -h 15 -2COMP -UDEC -holdScope twfI_i[7:0]
+addSignal -h 15 -2COMP -UDEC -holdScope loop_R[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope prog_R[23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope out_R[31:0]
+addSignal -h 15 -holdScope upper
+addSignal -h 15 -2COMP -UDEC -holdScope data_R_o[23:0]
+addSignal -expanded -h 15 -2COMP -UDEC /TESTBED/FFT_CORE/rearange_R[0:31]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[0][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[1][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[2][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[3][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[4][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[5][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[6][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[7][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[8][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[9][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[10][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[11][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[12][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[13][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[14][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[15][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[16][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[17][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[18][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[19][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[20][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[21][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[22][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[23][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[24][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[25][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[26][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[27][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[28][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[29][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[30][23:0]
+addSignal -h 15 -2COMP -UDEC -holdScope rearange_R[31][23:0]
+addGroup "G2"
+
+; getSignalForm Scope Hierarchy Status
+; active file of getSignalForm
+activeDirFile "" "/home/r07175/DSP_VLSI/HW1/01_RTL/FFT_RTL.fsdb"
+
+GETSIGNALFORM_SCOPE_HIERARCHY_BEGIN
+getSignalForm close
+
+"/TESTBED"
+"/TESTBED/FFT_CORE"
+"/TESTBED/FFT_CORE/s1"
+
+SCOPE_LIST_BEGIN
+"/TESTBED"
+"/TESTBED/FFT_CORE"
+"/TESTBED/FFT_CORE/s1"
+"/TESTBED/FFT_CORE/s5"
+"/TESTBED/FFT_CORE/s2"
+SCOPE_LIST_END
+
+GETSIGNALFORM_SCOPE_HIERARCHY_END
+
+
