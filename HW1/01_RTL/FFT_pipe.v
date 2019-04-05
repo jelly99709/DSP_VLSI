@@ -27,10 +27,10 @@ module FFT(
 	wire signed [LENGTH+15:0] s1_I_out_n, s2_I_out_n, s3_I_out_n, s4_I_out_n, s5_I_out;
 
 	//Rearangement shift register
-	reg signed [LENGTH+15:0] rearange_R   [0:31];
-	reg signed [LENGTH+15:0] rearange_R_n [0:31];
-	reg signed [LENGTH+15:0] rearange_I   [0:31];
-	reg signed [LENGTH+15:0] rearange_I_n [0:31];
+	reg signed [LENGTH+15:0] rearrange_R   [0:31];
+	reg signed [LENGTH+15:0] rearrange_R_n [0:31];
+	reg signed [LENGTH+15:0] rearrange_I   [0:31];
+	reg signed [LENGTH+15:0] rearrange_I_n [0:31];
 	
 	//Run flag
 	reg run, run_n;
@@ -40,8 +40,8 @@ module FFT(
 	assign out_valid = valid_o;
 
 	//Output rounding
-	assign dout_r = rearange_R[0][DECIMAL-1] ? rearange_R[0][DECIMAL+15:DECIMAL] + 1 : rearange_R[0][DECIMAL+15:DECIMAL];
-	assign dout_i = rearange_I[0][DECIMAL-1] ? rearange_I[0][DECIMAL+15:DECIMAL] + 1 : rearange_I[0][DECIMAL+15:DECIMAL];
+	assign dout_r = rearrange_R[0][DECIMAL-1] ? rearrange_R[0][DECIMAL+15:DECIMAL] + 1 : rearrange_R[0][DECIMAL+15:DECIMAL];
+	assign dout_i = rearrange_I[0][DECIMAL-1] ? rearrange_I[0][DECIMAL+15:DECIMAL] + 1 : rearrange_I[0][DECIMAL+15:DECIMAL];
 
 	//counter
 	reg  [5:0] cnt, cnt_n;
@@ -110,22 +110,22 @@ module FFT(
 		for(k = 0; k < 31; k = k + 1) begin
 			if(valid_o) begin
 				//Shift register
-				rearange_R_n[k] = rearange_R[k+1];
-				rearange_I_n[k] = rearange_I[k+1];
+				rearrange_R_n[k] = rearrange_R[k+1];
+				rearrange_I_n[k] = rearrange_I[k+1];
 			end
 			else begin
 				if(cnt_s5[5] && k == cnt_re) begin
-					rearange_R_n[k] = s5_R_out;
-					rearange_I_n[k] = s5_I_out;
+					rearrange_R_n[k] = s5_R_out;
+					rearrange_I_n[k] = s5_I_out;
 				end
 				else begin
-					rearange_R_n[k] = rearange_R[k];
-					rearange_I_n[k] = rearange_I[k];
+					rearrange_R_n[k] = rearrange_R[k];
+					rearrange_I_n[k] = rearrange_I[k];
 				end
 			end
 		end
-		rearange_R_n[31] = &cnt_s5 ? s5_R_out : rearange_R[31];
-		rearange_I_n[31] = &cnt_s5 ? s5_I_out : rearange_I[31];
+		rearrange_R_n[31] = &cnt_s5 ? s5_R_out : rearrange_R[31];
+		rearrange_I_n[31] = &cnt_s5 ? s5_I_out : rearrange_I[31];
 
 	end
 
@@ -138,8 +138,8 @@ module FFT(
 			s1_R_in <= 0;
 			s1_I_in <= 0;
 			for(k = 0; k < 32; k = k + 1) begin
-				rearange_R[k] <= 0;
-				rearange_I[k] <= 0;
+				rearrange_R[k] <= 0;
+				rearrange_I[k] <= 0;
 			end
 			s1_R_out <= 0; s1_I_out <= 0;
 			s2_R_out <= 0; s2_I_out <= 0;
@@ -153,8 +153,8 @@ module FFT(
 			s1_R_in <= s1_R_in_n;
 			s1_I_in <= s1_I_in_n;
 			for(k = 0; k < 32; k = k + 1) begin
-				rearange_R[k] <= rearange_R_n[k];
-				rearange_I[k] <= rearange_I_n[k];
+				rearrange_R[k] <= rearrange_R_n[k];
+				rearrange_I[k] <= rearrange_I_n[k];
 			end
 			s1_R_out <= s1_R_out_n; s1_I_out <= s1_I_out_n;
 			s2_R_out <= s2_R_out_n; s2_I_out <= s2_I_out_n;
