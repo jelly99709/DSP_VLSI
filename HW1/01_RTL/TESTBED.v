@@ -13,7 +13,7 @@ parameter IN_width		= 12;
 parameter OUT_width		= 16;
 parameter latency_limit		= 68;
 
-parameter cycle			= 10.0;
+parameter cycle			= 50.0;
 
 reg clk, rst_n, in_valid;
 wire out_valid;
@@ -30,9 +30,9 @@ initial begin
 
 	`ifdef RTL
 		$fsdbDumpfile("FFT_RTL.fsdb");
-		$fsdbDumpvars(0, FFT_CORE);
+		$fsdbDumpvars(0, FFT_CORE, "+mda");
 	`elsif GATE
-		$sdf_annotate("../02_SYN/Netlist/FFT_SYN.sdf",FFT_CORE);
+		$sdf_annotate("../02_SYN/Netlist/FFT_pipe_SYN.sdf",FFT_CORE);
 
 		`ifdef VCD
 			$dumpfile("FFT_GATE.vcd");

@@ -6,7 +6,7 @@ import numpy as np
 file = open('twiddle.v','w')
 
 #parameter declaration
-d = 6
+d = 8
 N = 32
 pi = np.pi
 j = 0 + 1j
@@ -23,11 +23,11 @@ for k in range(N/2):
 	if(I < 0): I += 4 #2's complement shift
 	R = int(round(R * (2 ** d)))
 	I = int(round(I * (2 ** d)))
-	R_ = bin(R)[2:].zfill(8)
-	I_ = bin(I)[2:].zfill(8)
-	file.write('assign ' + real_name + '[' + str(k) + '] = 8\'sb' + R_ + ';')
+	R_ = bin(R)[2:].zfill(d+2)
+	I_ = bin(I)[2:].zfill(d+2)
+	file.write('assign ' + real_name + '[' + str(k) + '] = ' + str(d+2) +'\'sb' + R_ + ';')
 	file.write('   ')
-	file.write('assign ' + imag_name + '[' + str(k) + '] = 8\'sb' + I_ + ';')
+	file.write('assign ' + imag_name + '[' + str(k) + '] = ' + str(d+2) +'\'sb' + I_ + ';')
 	file.write('\n')
 
 file.close()
