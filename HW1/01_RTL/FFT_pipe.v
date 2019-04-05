@@ -26,7 +26,7 @@ module FFT(
 	wire signed [LENGTH+15:0] s1_R_out_n, s2_R_out_n, s3_R_out_n, s4_R_out_n, s5_R_out;
 	wire signed [LENGTH+15:0] s1_I_out_n, s2_I_out_n, s3_I_out_n, s4_I_out_n, s5_I_out;
 
-	//Rearangement shift register
+	//Rearrangement shift register
 	reg signed [LENGTH+15:0] rearrange_R   [0:31];
 	reg signed [LENGTH+15:0] rearrange_R_n [0:31];
 	reg signed [LENGTH+15:0] rearrange_I   [0:31];
