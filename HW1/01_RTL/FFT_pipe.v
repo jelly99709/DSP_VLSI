@@ -10,7 +10,7 @@ module FFT(
 	);
 	
 	//parameter declaration
-	parameter DECIMAL = 8;
+	parameter DECIMAL = 7;
 	localparam LENGTH = DECIMAL + 2;
 	integer k;
 
@@ -26,7 +26,7 @@ module FFT(
 	wire signed [LENGTH+15:0] s1_R_out_n, s2_R_out_n, s3_R_out_n, s4_R_out_n, s5_R_out;
 	wire signed [LENGTH+15:0] s1_I_out_n, s2_I_out_n, s3_I_out_n, s4_I_out_n, s5_I_out;
 
-	//Rearrangement shift register
+	//rearrangement shift register
 	reg signed [LENGTH+15:0] rearrange_R   [0:31];
 	reg signed [LENGTH+15:0] rearrange_R_n [0:31];
 	reg signed [LENGTH+15:0] rearrange_I   [0:31];
@@ -40,18 +40,23 @@ module FFT(
 	assign out_valid = valid_o;
 
 	//Output rounding
-	assign dout_r = rearrange_R[0][DECIMAL-1] ? rearrange_R[0][DECIMAL+15:DECIMAL] + 1 : rearrange_R[0][DECIMAL+15:DECIMAL];
-	assign dout_i = rearrange_I[0][DECIMAL-1] ? rearrange_I[0][DECIMAL+15:DECIMAL] + 1 : rearrange_I[0][DECIMAL+15:DECIMAL];
+	//assign dout_r = rearrange_R[0][DECIMAL-1] ? rearrange_R[0][DECIMAL+15:DECIMAL] + 1 : rearrange_R[0][DECIMAL+15:DECIMAL];
+	//assign dout_i = rearrange_I[0][DECIMAL-1] ? rearrange_I[0][DECIMAL+15:DECIMAL] + 1 : rearrange_I[0][DECIMAL+15:DECIMAL];
+	assign dout_r = rearrange_R[0][DECIMAL+15:DECIMAL];
+	assign dout_i = rearrange_I[0][DECIMAL+15:DECIMAL];
 
 	//counter
 	reg  [5:0] cnt, cnt_n;
-	wire [4:0] cnt_s1, cnt_s2, cnt_s3, cnt_s4;
+	wire [4:0] cnt_s1;
+	wire [3:0] cnt_s2;
+	wire [2:0] cnt_s3;
+	wire [1:0] cnt_s4;
 	wire [5:0] cnt_s5;
 	reg  [4:0] cnt_re;
 	assign cnt_s1 = cnt[4:0] + 5'd16; //-16
-	assign cnt_s2 = cnt[4:0] + 5'd7;  //-24
-	assign cnt_s3 = cnt[4:0] + 5'd2;  //-28
-	assign cnt_s4 = cnt[4:0] - 5'd1;  //-30
+	assign cnt_s2 = cnt[3:0] + 4'd7;  //-24
+	assign cnt_s3 = cnt[2:0] + 3'd2;  //-28
+	assign cnt_s4 = cnt[1:0] - 2'd1;  //-30
 	assign cnt_s5 = cnt      - 6'd3;  //-31
 	always@(*) begin
 		for(k = 0; k < 5; k = k + 1) begin
@@ -60,44 +65,44 @@ module FFT(
 	end
 
 	//twiddle factor
-	wire signed [9:0] twf_R [0:15];
-	wire signed [9:0] twf_I [0:15];
-	assign twf_R[0] = 10'sb0100000000;   assign twf_I[0] = 10'sb0000000000;
-	assign twf_R[1] = 10'sb0011111011;   assign twf_I[1] = 10'sb1111001110;
-	assign twf_R[2] = 10'sb0011101101;   assign twf_I[2] = 10'sb1110011110;
-	assign twf_R[3] = 10'sb0011010101;   assign twf_I[3] = 10'sb1101110010;
-	assign twf_R[4] = 10'sb0010110101;   assign twf_I[4] = 10'sb1101001011;
-	assign twf_R[5] = 10'sb0010001110;   assign twf_I[5] = 10'sb1100101011;
-	assign twf_R[6] = 10'sb0001100010;   assign twf_I[6] = 10'sb1100010011;
-	assign twf_R[7] = 10'sb0000110010;   assign twf_I[7] = 10'sb1100000101;
-	assign twf_R[8] = 10'sb0000000000;   assign twf_I[8] = 10'sb1100000000;
-	assign twf_R[9] = 10'sb1111001110;   assign twf_I[9] = 10'sb1100000101;
-	assign twf_R[10] = 10'sb1110011110;   assign twf_I[10] = 10'sb1100010011;
-	assign twf_R[11] = 10'sb1101110010;   assign twf_I[11] = 10'sb1100101011;
-	assign twf_R[12] = 10'sb1101001011;   assign twf_I[12] = 10'sb1101001011;
-	assign twf_R[13] = 10'sb1100101011;   assign twf_I[13] = 10'sb1101110010;
-	assign twf_R[14] = 10'sb1100010011;   assign twf_I[14] = 10'sb1110011110;
-	assign twf_R[15] = 10'sb1100000101;   assign twf_I[15] = 10'sb1111001110;
+	wire signed [8:0] twf_R [0:15];
+	wire signed [8:0] twf_I [0:15];
+	assign twf_R[0] = 9'sb010000000;   assign twf_I[0] = 9'sb000000000;
+	assign twf_R[1] = 9'sb001111110;   assign twf_I[1] = 9'sb111100111;
+	assign twf_R[2] = 9'sb001110110;   assign twf_I[2] = 9'sb111001111;
+	assign twf_R[3] = 9'sb001101010;   assign twf_I[3] = 9'sb110111001;
+	assign twf_R[4] = 9'sb001011011;   assign twf_I[4] = 9'sb110100101;
+	assign twf_R[5] = 9'sb001000111;   assign twf_I[5] = 9'sb110010110;
+	assign twf_R[6] = 9'sb000110001;   assign twf_I[6] = 9'sb110001010;
+	assign twf_R[7] = 9'sb000011001;   assign twf_I[7] = 9'sb110000010;
+	assign twf_R[8] = 9'sb000000000;   assign twf_I[8] = 9'sb110000000;
+	assign twf_R[9] = 9'sb111100111;   assign twf_I[9] = 9'sb110000010;
+	assign twf_R[10] = 9'sb111001111;   assign twf_I[10] = 9'sb110001010;
+	assign twf_R[11] = 9'sb110111001;   assign twf_I[11] = 9'sb110010110;
+	assign twf_R[12] = 9'sb110100101;   assign twf_I[12] = 9'sb110100101;
+	assign twf_R[13] = 9'sb110010110;   assign twf_I[13] = 9'sb110111001;
+	assign twf_R[14] = 9'sb110001010;   assign twf_I[14] = 9'sb111001111;
+	assign twf_R[15] = 9'sb110000010;   assign twf_I[15] = 9'sb111100111;
 
 	//Butterfly stages
 	butterfly #(.DELAY(16), .DECIMAL(DECIMAL)) s1(
-		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s1), .twfR_i(twf_R[cnt_s1[3:0]]), .twfI_i(twf_I[cnt_s1[3:0]]),
+		.clk(clk), .rst_n(rst_n), .upper_i(~cnt_s1[4]), .twfR_i(twf_R[cnt_s1[3:0]]), .twfI_i(twf_I[cnt_s1[3:0]]),
 		.data_R_i(s1_R_in), .data_I_i(s1_I_in), .data_R_o(s1_R_out_n), .data_I_o(s1_I_out_n), .valid_i(in_valid)
 		);
 	butterfly #(.DELAY(8), .DECIMAL(DECIMAL)) s2(
-		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s2), .twfR_i(twf_R[{cnt_s2[2:0],1'd0}]), .twfI_i(twf_I[{cnt_s2[2:0],1'd0}]),
+		.clk(clk), .rst_n(rst_n), .upper_i(~cnt_s2[3]), .twfR_i(twf_R[{cnt_s2[2:0],1'd0}]), .twfI_i(twf_I[{cnt_s2[2:0],1'd0}]),
 		.data_R_i(s1_R_out), .data_I_i(s1_I_out), .data_R_o(s2_R_out_n), .data_I_o(s2_I_out_n), .valid_i(in_valid)
 		);
 	butterfly #(.DELAY(4), .DECIMAL(DECIMAL)) s3(
-		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s3), .twfR_i(twf_R[{cnt_s3[1:0],2'd0}]), .twfI_i(twf_I[{cnt_s3[1:0],2'd0}]),
+		.clk(clk), .rst_n(rst_n), .upper_i(~cnt_s3[2]), .twfR_i(twf_R[{cnt_s3[1:0],2'd0}]), .twfI_i(twf_I[{cnt_s3[1:0],2'd0}]),
 		.data_R_i(s2_R_out), .data_I_i(s2_I_out), .data_R_o(s3_R_out_n), .data_I_o(s3_I_out_n), .valid_i(in_valid)
 		);
 	butterfly #(.DELAY(2), .DECIMAL(DECIMAL)) s4(
-		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s4), .twfR_i(twf_R[{cnt_s4[0],3'd0}]), .twfI_i(twf_I[{cnt_s4[0],3'd0}]),
+		.clk(clk), .rst_n(rst_n), .upper_i(~cnt_s4[1]), .twfR_i(twf_R[{cnt_s4[0],3'd0}]), .twfI_i(twf_I[{cnt_s4[0],3'd0}]),
 		.data_R_i(s3_R_out), .data_I_i(s3_I_out), .data_R_o(s4_R_out_n), .data_I_o(s4_I_out_n), .valid_i(in_valid)
 		);
 	butterfly #(.DELAY(1), .DECIMAL(DECIMAL)) s5(
-		.clk(clk), .rst_n(rst_n), .cnt_i(cnt_s5[4:0]), .twfR_i(twf_R[4'd0]), .twfI_i(twf_I[4'd0]),
+		.clk(clk), .rst_n(rst_n), .upper_i(~cnt_s5[0]), .twfR_i(twf_R[4'd0]), .twfI_i(twf_I[4'd0]),
 		.data_R_i(s4_R_out), .data_I_i(s4_I_out), .data_R_o(s5_R_out), .data_I_o(s5_I_out), .valid_i(in_valid)
 		);
 
@@ -169,7 +174,7 @@ module butterfly(
 	clk,
 	rst_n,
 	valid_i,
-	cnt_i,
+	upper_i,
 	twfR_i,
 	twfI_i,
 	data_R_i,
@@ -186,7 +191,7 @@ module butterfly(
 
 	//port definition
 	input clk, rst_n, valid_i;
-	input [4:0] cnt_i;
+	input upper_i;
 	input signed [LENGTH-1:0] twfR_i;
 	input signed [LENGTH-1:0] twfI_i;
 	input signed [LENGTH+15:0] data_R_i;
@@ -195,32 +200,34 @@ module butterfly(
 	output signed [LENGTH+15:0] data_I_o;	
 
 	//Delay blocks
-	reg signed [LENGTH+15:0] delay_R [0:15];
-	reg signed [LENGTH+15:0] delay_I [0:15];
+	reg signed [LENGTH+15:0] delay_R [0:DELAY-1];
+	reg signed [LENGTH+15:0] delay_I [0:DELAY-1];
 
 	//Flag to determine upper half and lower half
-	wire upper;
-	assign upper = ~cnt_i[$clog2(DELAY)];
+	//wire upper;
+	//assign upper = ~cnt_i[$clog2(DELAY)];
 
 	//Radix-2 butterfly circuit 
 	wire signed [LENGTH+15:0] loop_R, loop_I;
 	wire signed [LENGTH+15:0] prog_R, prog_I;
-	assign loop_R = ~upper ? data_R_i : delay_R[DELAY-1] - data_R_i;
-	assign loop_I = ~upper ? data_I_i : delay_I[DELAY-1] - data_I_i;
-	assign prog_R = upper ? delay_R[DELAY-1] + data_R_i : delay_R[DELAY-1];
-	assign prog_I = upper ? delay_I[DELAY-1] + data_I_i : delay_I[DELAY-1];
+	assign loop_R = ~upper_i ? data_R_i : delay_R[DELAY-1] - data_R_i;
+	assign loop_I = ~upper_i ? data_I_i : delay_I[DELAY-1] - data_I_i;
+	assign prog_R = upper_i ? delay_R[DELAY-1] + data_R_i : delay_R[DELAY-1];
+	assign prog_I = upper_i ? delay_I[DELAY-1] + data_I_i : delay_I[DELAY-1];
 
 	//output complex multiplication
 	wire signed [LENGTH*2+15:0] out_R;
 	wire signed [LENGTH*2+15:0] out_I;
 	wire signed [LENGTH*2+15:0] RR, II, RI, IR;
 	assign RR = prog_R * twfR_i; assign II = prog_I * twfI_i; assign RI = prog_R * twfI_i; assign IR = prog_I * twfR_i;
-	assign out_R = ~upper ? (RR - II) : {{2{prog_R[LENGTH+15]}},prog_R,{DECIMAL{1'b0}}};
-	assign out_I = ~upper ? (RI + IR) : {{2{prog_I[LENGTH+15]}},prog_I,{DECIMAL{1'b0}}};
+	assign out_R = ~upper_i ? (RR - II) : {{2{prog_R[LENGTH+15]}},prog_R,{DECIMAL{1'b0}}};
+	assign out_I = ~upper_i ? (RI + IR) : {{2{prog_I[LENGTH+15]}},prog_I,{DECIMAL{1'b0}}};
 
 	//output rounding
-	assign data_R_o = out_R[DECIMAL-1] ? out_R[LENGTH+DECIMAL+15:DECIMAL] + 1 : out_R[LENGTH+DECIMAL+15:DECIMAL];
-	assign data_I_o = out_I[DECIMAL-1] ? out_I[LENGTH+DECIMAL+15:DECIMAL] + 1 : out_I[LENGTH+DECIMAL+15:DECIMAL];
+	//assign data_R_o = out_R[DECIMAL-1] ? out_R[LENGTH+DECIMAL+15:DECIMAL] + 1 : out_R[LENGTH+DECIMAL+15:DECIMAL];
+	//assign data_I_o = out_I[DECIMAL-1] ? out_I[LENGTH+DECIMAL+15:DECIMAL] + 1 : out_I[LENGTH+DECIMAL+15:DECIMAL];
+	assign data_R_o = out_R[LENGTH+DECIMAL+15:DECIMAL];
+	assign data_I_o = out_I[LENGTH+DECIMAL+15:DECIMAL];
 
 	//Sequential circuit
 	always@(posedge clk or negedge rst_n) begin

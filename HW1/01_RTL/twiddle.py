@@ -6,16 +6,16 @@ import numpy as np
 file = open('twiddle.v','w')
 
 #parameter declaration
-d = 8
+d = 7
 N = 32
 pi = np.pi
 j = 0 + 1j
 real_name = 'twf_R'
 imag_name = 'twf_I'
 
-file.write('wire signed [' + str(d+1) + ':0] ' + real_name + ' [0:' + str(N/2-1) + '];\n')
-file.write('wire signed [' + str(d+1) + ':0] ' + imag_name + ' [0:' + str(N/2-1) + '];\n')
-for k in range(N/2):
+file.write('wire signed [' + str(d+1) + ':0] ' + real_name + ' [0:' + str(int(N/2-1)) + '];\n')
+file.write('wire signed [' + str(d+1) + ':0] ' + imag_name + ' [0:' + str(int(N/2-1)) + '];\n')
+for k in range(16):
 	W_k = np.exp(-j*2*pi*k/N)
 	R = np.real(W_k)
 	I = np.imag(W_k)
