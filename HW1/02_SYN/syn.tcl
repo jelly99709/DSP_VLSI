@@ -15,15 +15,17 @@ set compile_fix_multiple_port_nets "TRUE"
 
 set DESIGN "FFT"
 set CLOCK "clk"
-set CLOCK_PERIOD 10.0
+set CLOCK_PERIOD 20.0
 read_file -format verilog $DESIGN\.v
 
-current_design $DESIGN
+current_design FFT
 link
 
 create_clock $CLOCK -period $CLOCK_PERIOD
 set_ideal_network -no_propagate $CLOCK
 set_dont_touch_network [get_ports clk]
+
+#set_clock_gating_style -max_fanout 5 
 
 set_clock_uncertainty  0.1  $CLOCK
 set_input_delay  [ expr $CLOCK_PERIOD*0.5 ] -clock $CLOCK [all_inputs]
@@ -42,11 +44,17 @@ uniquify
 set_fix_multiple_port_nets -all -buffer_constants  [get_designs *]
 set_fix_hold [all_clocks]
 
+set_max_area 0
 compile_ultra
+#compile_ultra -gate_clock
+optimize_netlist -area
+optimize_netlist -area
+optimize_netlist -area
 
 report_area > Report/$DESIGN\.area
 report_power > Report/$DESIGN\.power
 report_timing -path full -delay max > Report/$DESIGN\.timing
+#report_clock_gating -gating_element > Report/$DESIGN\.gate_clock
 
 set bus_inference_style "%s\[%d\]"
 set bus_naming_style "%s\[%d\]"

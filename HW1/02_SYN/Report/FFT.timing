@@ -1,0 +1,96 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : FFT
+Version: N-2017.09-SP2
+Date   : Mon Apr  8 21:55:59 2019
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: WCCOM   Library: fsa0m_a_generic_core_ss1p62v125c
+Wire Load Model Mode: top
+
+  Startpoint: cnt_reg[3] (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rearrange_I_reg[25][21]
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  FFT                G5K                   fsa0m_a_generic_core_ss1p62v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clk (rise edge)                                   0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  cnt_reg[3]/CK (QDFFRBP)                                 0.00 #     0.00 r
+  cnt_reg[3]/Q (QDFFRBP)                                  0.51       0.51 r
+  s2/upper_i (butterfly_DECIMAL6_3)                       0.00       0.51 r
+  s2/U199/O (BUF6)                                        0.43       0.93 r
+  s2/U111/O (AN2)                                         0.27       1.21 r
+  s2/U110/S (HA1S)                                        0.26       1.47 r
+  s2/data_I_o[0] (butterfly_DECIMAL6_3)                   0.00       1.47 r
+  s3/data_I_i[0] (butterfly_DECIMAL6_2)                   0.00       1.47 r
+  s3/U215/O (INV1S)                                       0.25       1.72 f
+  s3/U216/O (OR2S)                                        0.32       2.03 f
+  s3/U574/CO (FA1S)                                       0.47       2.50 f
+  s3/U551/CO (FA1S)                                       0.49       3.00 f
+  s3/U527/CO (FA1S)                                       0.49       3.49 f
+  s3/U504/CO (FA1S)                                       0.49       3.98 f
+  s3/U480/CO (FA1S)                                       0.49       4.48 f
+  s3/U457/CO (FA1S)                                       0.49       4.97 f
+  s3/U433/CO (FA1S)                                       0.49       5.47 f
+  s3/U410/CO (FA1S)                                       0.49       5.96 f
+  s3/U387/CO (FA1S)                                       0.49       6.45 f
+  s3/U364/CO (FA1S)                                       0.49       6.95 f
+  s3/U343/CO (FA1S)                                       0.49       7.44 f
+  s3/U322/CO (FA1S)                                       0.49       7.93 f
+  s3/U300/CO (FA1S)                                       0.49       8.43 f
+  s3/U279/CO (FA1S)                                       0.49       8.92 f
+  s3/U233/CO (FA1S)                                       0.49       9.42 f
+  s3/U234/S (FA1S)                                        1.70      11.12 r
+  s3/U9/O (MOAI1S)                                        0.30      11.41 f
+  s3/U886/O (OAI22S)                                      0.39      11.81 r
+  s3/U912/S (FA1S)                                        0.56      12.36 f
+  s3/U935/S (FA1S)                                        0.68      13.05 r
+  s3/U974/S (FA1S)                                        0.55      13.60 f
+  s3/U1262/CO (FA1S)                                      0.52      14.12 f
+  s3/U1264/CO (FA1S)                                      0.49      14.61 f
+  s3/U1266/CO (FA1S)                                      0.51      15.12 f
+  s3/U1268/CO (FA1)                                       0.38      15.50 f
+  s3/U1270/CO (FA1S)                                      0.48      15.98 f
+  s3/U1272/CO (FA1)                                       0.38      16.37 f
+  s3/U1274/CO (FA1)                                       0.35      16.72 f
+  s3/U1276/CO (FA1S)                                      0.48      17.20 f
+  s3/U1278/CO (FA1)                                       0.38      17.58 f
+  s3/U159/CO (FA1S)                                       0.48      18.06 f
+  s3/U1194/CO (FA1)                                       0.39      18.45 f
+  s3/U1195/O (MOAI1)                                      0.28      18.74 f
+  s3/U1196/O (XNR2HS)                                     0.17      18.91 f
+  s3/U1197/O (MOAI1S)                                     0.29      19.20 r
+  s3/U596/O (AO22S)                                       0.28      19.47 r
+  s3/loop_I_o[21] (butterfly_DECIMAL6_2)                  0.00      19.47 r
+  U2983/O (ND2)                                           0.10      19.58 f
+  U2984/O (ND2)                                           0.15      19.73 r
+  rearrange_I_reg[25][21]/D (QDFFRBS)                     0.00      19.73 r
+  data arrival time                                                 19.73
+
+  clock clk (rise edge)                                  20.00      20.00
+  clock network delay (ideal)                             0.00      20.00
+  clock uncertainty                                      -0.10      19.90
+  rearrange_I_reg[25][21]/CK (QDFFRBS)                    0.00      19.90 r
+  library setup time                                     -0.17      19.73
+  data required time                                                19.73
+  --------------------------------------------------------------------------
+  data required time                                                19.73
+  data arrival time                                                -19.73
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
