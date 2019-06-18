@@ -3,6 +3,7 @@
 
 #nWave
 nWaveLog/*
+nWaveLog
 
 #dc_shell
 command.log
@@ -16,6 +17,7 @@ novas_dump.log
 *.fsdb
 signal.rc
 INCA_libs/*
+INCA_libs
 
 #apr
 *.mr
