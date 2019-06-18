@@ -142,7 +142,7 @@ module PEs (
         .X0_i(PE0_X0_in),
         .Y0_i(PE0_Y0_in),
         .X1_i(PE0_X1_in),
-        .Y1_i(PE0_X1_in),
+        .Y1_i(PE0_Y1_in),
         .angle_d0_i(PE0_angle_d0_in),
         .angle_d1_i(PE0_angle_d1_in), 
 
@@ -166,7 +166,7 @@ module PEs (
         .X0_i(PE1_X0_in),
         .Y0_i(PE1_Y0_in),
         .X1_i(PE1_X1_in),
-        .Y1_i(PE1_X1_in),
+        .Y1_i(PE1_Y1_in),
         .angle_d0_i(PE1_angle_d0_in),
         .angle_d1_i(PE1_angle_d1_in), 
 
@@ -183,18 +183,22 @@ module PEs (
 
 
     always @(*) begin
-        for(i=0;i<CORDIC_NUM;i=i+1) begin
+        for(i=0;i<CORDIC_NUM/2;i=i+1) begin
             if(PE0_angle_val0_out[i]) begin
-                angle0_reg_n[i] = PE0_angle_d0_out[i];
+                angle0_reg_n[2*i] = PE0_angle_d0_out[2*i];
+                angle0_reg_n[2*i+1] = PE0_angle_d0_out[2*i+1];
             end
             else begin
-                angle0_reg_n[i] = angle0_reg[i];
+                angle0_reg_n[2*i] = angle0_reg[2*i];
+                angle0_reg_n[2*i+1] = angle0_reg[2*i+1];
             end
             if(PE0_angle_val1_out[i]) begin
-                angle1_reg_n[i] = PE0_angle_d1_out[i];
+                angle1_reg_n[2*i] = PE0_angle_d1_out[2*i];
+                angle1_reg_n[2*i+1] = PE0_angle_d1_out[2*i+1];
             end
             else begin
-                angle1_reg_n[i] = angle1_reg[i];
+                angle1_reg_n[2*i] = angle1_reg[2*i];
+                angle1_reg_n[2*i+1] = angle1_reg[2*i+1];
             end
         end
     end
@@ -277,30 +281,30 @@ module PE(
     wire [CORDIC_NUM-1:0] COR_dout_0, COR_dout_1;
     reg COR_mode_0, COR_mode_1;
 
-    reg [CORDIC_NUM/2:0]   isswap, isswap_n;
-    reg [CORDIC_NUM/2-1:0] a0_val, a0_val_n;
-    reg [CORDIC_NUM/2-1:0] a1_val, a1_val_n;
-    reg [CORDIC_NUM-1:0] same_din;
+    reg [CORDIC_NUM/2:0] isswap, isswap_n;
+    reg [CORDIC_NUM/2-2:0] a0_val, a0_val_n;
+    reg [CORDIC_NUM/2-2:0] a1_val, a1_val_n;
+    reg [CORDIC_NUM-1:0] same_dout;
 
     integer i;
 
-    assign {COR_start_1, COR_start_0} = ~idle;
-    assign COR_Xin_0 = (isswap_n[0])? Y1_i : X0_i;
-    assign COR_Yin_0 = Y0_i;
-    assign COR_Xin_1 = X1_i;
-    assign COR_Yin_1 = (isswap_n[0])? X0_i : Y1_i;
+    assign {COR_start_1, COR_start_0} = (~idle);
+    assign COR_Xin_0 = X0_i;
+    assign COR_Yin_0 = (isswap_n[0])? X1_i : Y0_i;
+    assign COR_Xin_1 = (isswap_n[0])? Y0_i : X1_i;
+    assign COR_Yin_1 =  Y1_i;
     assign COR_din_0 = angle_d0_i;
     assign COR_din_1 = angle_d1_i;
 
 
-    assign X0_o = (isswap[CORDIC_NUM/2])? COR_Yout_1 : COR_Xout_0;
-    assign Y0_o = COR_Yout_0;
-    assign X1_o = COR_Xout_1;
-    assign Y1_o = (isswap[CORDIC_NUM/2])? COR_Xout_0 : COR_Yout_1;
+    assign X0_o = COR_Xout_0;
+    assign Y0_o = (isswap[CORDIC_NUM/2])?  COR_Xout_1 : COR_Yout_0;
+    assign X1_o = (isswap[CORDIC_NUM/2])?  COR_Yout_0 : COR_Xout_1;
+    assign Y1_o = COR_Yout_1;
     assign angle_d0_o = COR_dout_0;
-    assign angle_d1_o = (COR_dout_1 & (~same_din)) | (COR_dout_0 & (same_din));
-    assign angle_val0_o = a0_val;
-    assign angle_val1_o = a1_val; 
+    assign angle_d1_o = (COR_dout_1 & (~same_dout)) | (COR_dout_0 & (same_dout));
+    assign angle_val0_o = {a0_val, COR_start_0 & (~COR_mode_0)};
+    assign angle_val1_o = ({a1_val, COR_start_1 & (~COR_mode_1)} & ~{isswap[CORDIC_NUM/2-2:0], isswap_n[0]}) | ({a0_val, COR_start_0 & (~COR_mode_0)} & {isswap[CORDIC_NUM/2-2:0], isswap_n[0]}); 
 
     CORDIC_VR #(BITWIDTH,CORDIC_NUM) CORDIC0(
         .clk(clk),   
@@ -330,11 +334,11 @@ module PE(
 
     always @(*) begin
 
-        same_din[0] = isswap_n[0];
-        same_din[1] = isswap_n[0];
+        same_dout[0] = isswap_n[0];
+        same_dout[1] = isswap_n[0];
         for(i=1;i<CORDIC_NUM/2;i=i+1) begin
-            same_din[2*i]   = isswap[i-1];
-            same_din[2*i+1] = isswap[i-1];
+            same_dout[2*i]   = isswap[i-1];
+            same_dout[2*i+1] = isswap[i-1];
         end
     end
 
@@ -366,10 +370,10 @@ module PE(
             isswap_n[i] = isswap[i-1];
         end
 
-        a0_val_n[i] = COR_start_0 & (~COR_mode_0);
-        a1_val_n[i] = COR_start_1 & (~COR_mode_1);
+        a0_val_n[0] = COR_start_0 & (~COR_mode_0);
+        a1_val_n[0] = COR_start_1 & (~COR_mode_1);
 
-        for(i=1;i<CORDIC_NUM/2;i=i+1) begin
+        for(i=1;i<CORDIC_NUM/2-1;i=i+1) begin
             a0_val_n[i] = a0_val[i-1];
             a1_val_n[i] = a1_val[i-1];
         end    
@@ -380,7 +384,7 @@ module PE(
             for(i=0;i<CORDIC_NUM/2+1;i=i+1) begin
                 isswap[i] <= 0;
             end
-            for(i=0;i<CORDIC_NUM/2;i=i+1) begin
+            for(i=0;i<CORDIC_NUM/2-1;i=i+1) begin
                 a0_val[i] = 0;
                 a1_val[i] = 0;
             end
@@ -389,7 +393,7 @@ module PE(
             for(i=0;i<CORDIC_NUM/2+1;i=i+1) begin
                 isswap[i] <= isswap_n[i];
             end
-            for(i=0;i<CORDIC_NUM/2;i=i+1) begin
+            for(i=0;i<CORDIC_NUM/2-1;i=i+1) begin
                 a0_val[i] = a0_val_n[i];
                 a1_val[i] = a1_val_n[i];
             end
@@ -565,8 +569,8 @@ module CORDIC_VR(
             mode_n[i] = mode[i-1];
         end
 
-        X_reg_n[CORDIC_NUM/2] = {scaling_X[15+BITWIDTH-1], scaling_X[15+BITWIDTH-3:BITWIDTH-4]} + scaling_X[BITWIDTH-5];
-        Y_reg_n[CORDIC_NUM/2] = {scaling_Y[15+BITWIDTH-1], scaling_Y[15+BITWIDTH-3:BITWIDTH-4]} + scaling_Y[BITWIDTH-5];
+        X_reg_n[CORDIC_NUM/2] = {1'b0,{scaling_X[15+BITWIDTH-1], scaling_X[15+BITWIDTH-3:BITWIDTH-4]} + scaling_X[BITWIDTH-5]};
+        Y_reg_n[CORDIC_NUM/2] = {1'b0,{scaling_Y[15+BITWIDTH-1], scaling_Y[15+BITWIDTH-3:BITWIDTH-4]} + scaling_Y[BITWIDTH-5]};
     end
 
     always @(*) begin
