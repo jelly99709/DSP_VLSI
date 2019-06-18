@@ -111,9 +111,20 @@ module PEs (
     assign PE0_X1_in  = PE0_X1_i;
     assign PE0_Y1_in  = PE0_Y1_i;
 
+    /*
     always @(*) begin
         PE0_angle_d0_in = angle0_reg;
         PE0_angle_d1_in = angle1_reg;
+    end
+    */
+
+    always @(*) begin
+        for(i=0;i<CORDIC_NUM/2;i=i+1) begin
+            PE0_angle_d0_in[2*i]   = (angle0_reg[2*i]   & (~PE0_angle_val0_out[i])) | (PE0_angle_d0_out[2*i]   & (PE0_angle_val0_out[i]));
+            PE0_angle_d0_in[2*i+1] = (angle0_reg[2*i+1] & (~PE0_angle_val0_out[i])) | (PE0_angle_d0_out[2*i+1] & (PE0_angle_val0_out[i]));
+            PE0_angle_d1_in[2*i]   = (angle1_reg[2*i]   & (~PE0_angle_val1_out[i])) | (PE0_angle_d1_out[2*i]   & (PE0_angle_val1_out[i]));
+            PE0_angle_d1_in[2*i+1] = (angle1_reg[2*i+1] & (~PE0_angle_val1_out[i])) | (PE0_angle_d1_out[2*i+1] & (PE0_angle_val1_out[i]));
+        end
     end
 
 
