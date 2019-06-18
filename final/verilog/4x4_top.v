@@ -36,10 +36,10 @@ module TOP(
 	localparam RELATED_ROTATE = 2'd3;
 
 	//wire & reg declaration
-	reg [BIT_NUM-1:0] dataR   [0:CHANNEL_SIZE-1];
-	reg [BIT_NUM-1:0] dataR_n [0:CHANNEL_SIZE-1];
-	reg [BIT_NUM-1:0] dataI   [0:CHANNEL_SIZE-1];
-	reg [BIT_NUM-1:0] dataI_n [0:CHANNEL_SIZE-1];
+	reg signed [BIT_NUM-1:0] dataR   [0:CHANNEL_SIZE-1];
+	reg signed [BIT_NUM-1:0] dataR_n [0:CHANNEL_SIZE-1];
+	reg signed [BIT_NUM-1:0] dataI   [0:CHANNEL_SIZE-1];
+	reg signed [BIT_NUM-1:0] dataI_n [0:CHANNEL_SIZE-1];
 	reg [$clog2(CHANNEL_SIZE)-1:0] cnt, cnt_n;
 	reg valid_o_n;
 
