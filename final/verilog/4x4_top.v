@@ -17,7 +17,7 @@ module TOP(
 	input clk, rst_n;
 	input valid_i;
 	input signed [BIT_NUM-1:0] R_i, I_i;
-	output signed [BIT_NUM-1:0] R_o, I_o;
+	output reg signed [BIT_NUM-1:0] R_o, I_o;
 	output reg valid_o;
 
 	//internal port declaration
@@ -38,7 +38,7 @@ module TOP(
 	reg [BIT_NUM-1:0] dataR_n [0:CHANNEL_SIZE-1];
 	reg [BIT_NUM-1:0] dataI   [0:CHANNEL_SIZE-1];
 	reg [BIT_NUM-1:0] dataI_n [0:CHANNEL_SIZE-1];
-	reg [$log2(CHANNEL_SIZE)-1:0] cnt, cnt_n;
+	reg [$clog2(CHANNEL_SIZE)-1:0] cnt, cnt_n;
 	reg valid_o_n;
 
 	//state definition
@@ -358,10 +358,10 @@ module TOP(
 			SEND: begin
 				R_o = dataR[cnt];
 				I_o = dataI[cnt];
-				valid_o = cnt == 4'd15 ? 0 : 1;
+				valid_o_n = cnt == 4'd15 ? 0 : 1;
 			end
 			DONE: begin
-				valid_o = 0;
+				valid_o_n = 0;
 			end
 		endcase
 	end
