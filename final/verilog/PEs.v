@@ -2,8 +2,8 @@ module PEs (
     clk,   
     rst_n,
     valid_i,
-    PE0_scheme, 
-    PE1_scheme,
+    PE0_scheme_i, 
+    PE1_scheme_i,
 
     PE0_X0_i,
     PE0_Y0_i,
