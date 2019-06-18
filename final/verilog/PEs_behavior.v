@@ -80,10 +80,10 @@ module PEs(
     				y_v1_i = PE0_Y0_i;
     				x_v2_i = PE0_X1_i;
     				y_v2_i = PE0_Y1_i;
-    				PE0_X0_o = #(`CYCLE*8) x_v1_o;
-    				PE0_Y0_o = #(`CYCLE*8) y_v1_o;
-    				PE0_X1_o = #(`CYCLE*8) x_v2_o;
-    				PE0_Y1_o = #(`CYCLE*8) y_v2_o;
+    				PE0_X0_o <= #(`CYCLE*8) x_v1_o;
+    				PE0_Y0_o <= #(`CYCLE*8) y_v1_o;
+    				PE0_X1_o <= #(`CYCLE*8) x_v2_o;
+    				PE0_Y1_o <= #(`CYCLE*8) y_v2_o;
     			end
     			2'd1: begin
     				x_r3_i = PE0_X0_i;
@@ -91,11 +91,11 @@ module PEs(
     				x_r4_i = PE0_X1_i;
     				y_r4_i = PE0_Y1_i;
     				d3_i = d1_o;
-    				d4_i = d1_o;
-    				PE0_X0_o = #(`CYCLE*8) x_r3_o;
-    				PE0_Y0_o = #(`CYCLE*8) y_r3_o;
-    				PE0_X1_o = #(`CYCLE*8) x_r4_o;
-    				PE0_Y1_o = #(`CYCLE*8) y_r4_o;
+    				d4_i = d2_o;
+    				PE0_X0_o <= #(`CYCLE*8) x_r3_o;
+    				PE0_Y0_o <= #(`CYCLE*8) y_r3_o;
+    				PE0_X1_o <= #(`CYCLE*8) x_r4_o;
+    				PE0_Y1_o <= #(`CYCLE*8) y_r4_o;
     			end
     			2'd2: begin
     				x_v1_i = PE0_X0_i;
@@ -103,10 +103,10 @@ module PEs(
     				x_r3_i = PE0_Y0_i;
     				y_r3_i = PE0_Y1_i;
     				d3_i = d1_o;
-    				PE0_X0_o = #(`CYCLE*8) x_v1_o;
-    				PE0_Y0_o = #(`CYCLE*8) x_r3_o;
-    				PE0_X1_o = #(`CYCLE*8) y_v1_o;
-    				PE0_Y1_o = #(`CYCLE*8) y_r3_o;
+    				PE0_X0_o <= #(`CYCLE*8) x_v1_o;
+    				PE0_Y0_o <= #(`CYCLE*8) x_r3_o;
+    				PE0_X1_o <= #(`CYCLE*8) y_v1_o;
+    				PE0_Y1_o <= #(`CYCLE*8) y_r3_o;
     			end
     			2'd3: begin
     				x_r4_i = PE0_X0_i;
@@ -115,10 +115,10 @@ module PEs(
     				y_r3_i = PE0_Y1_i;
     				d3_i = d1_o;
     				d4_i = d1_o;
-    				PE0_X0_o = #(`CYCLE*8) x_r4_o;
-    				PE0_Y0_o = #(`CYCLE*8) x_r3_o;
-    				PE0_X1_o = #(`CYCLE*8) y_r4_o;
-    				PE0_Y1_o = #(`CYCLE*8) y_r3_o;
+    				PE0_X0_o <= #(`CYCLE*8) x_r4_o;
+    				PE0_Y0_o <= #(`CYCLE*8) x_r3_o;
+    				PE0_X1_o <= #(`CYCLE*8) y_r4_o;
+    				PE0_Y1_o <= #(`CYCLE*8) y_r3_o;
     			end
     		endcase
     		case(PE1_scheme_i)
@@ -129,10 +129,10 @@ module PEs(
     				y_r2_i = PE1_Y1_i;
     				d1_i = d1_o;
     				d2_i = d2_o;
-    				PE1_X0_o = #(`CYCLE*8) x_r1_o;
-    				PE1_Y0_o = #(`CYCLE*8) y_r1_o;
-    				PE1_X1_o = #(`CYCLE*8) x_r2_o;
-    				PE1_Y1_o = #(`CYCLE*8) y_r2_o;
+    				PE1_X0_o <= #(`CYCLE*8) x_r1_o;
+    				PE1_Y0_o <= #(`CYCLE*8) y_r1_o;
+    				PE1_X1_o <= #(`CYCLE*8) x_r2_o;
+    				PE1_Y1_o <= #(`CYCLE*8) y_r2_o;
     			end
     			2'd1: begin
     				x_r1_i = PE1_X0_i;
@@ -140,11 +140,11 @@ module PEs(
     				x_r2_i = PE1_X1_i;
     				y_r2_i = PE1_Y1_i;
     				d1_i = d1_o;
-    				d2_i = d1_o;
-    				PE1_X0_o = #(`CYCLE*8) x_r1_o;
-    				PE1_Y0_o = #(`CYCLE*8) y_r1_o;
-    				PE1_X1_o = #(`CYCLE*8) x_r2_o;
-    				PE1_Y1_o = #(`CYCLE*8) y_r2_o;
+    				d2_i = d2_o;
+    				PE1_X0_o <= #(`CYCLE*8) x_r1_o;
+    				PE1_Y0_o <= #(`CYCLE*8) y_r1_o;
+    				PE1_X1_o <= #(`CYCLE*8) x_r2_o;
+    				PE1_Y1_o <= #(`CYCLE*8) y_r2_o;
     			end
     			2'd2: begin
     				x_r1_i = PE1_X0_i;
@@ -153,10 +153,10 @@ module PEs(
     				y_r2_i = PE1_Y1_i;
     				d1_i = d1_o;
     				d2_i = d1_o;
-    				PE1_X0_o = #(`CYCLE*8) x_r1_o;
-    				PE1_Y0_o = #(`CYCLE*8) x_r2_o;
-    				PE1_X1_o = #(`CYCLE*8) y_r1_o;
-    				PE1_Y1_o = #(`CYCLE*8) y_r2_o;
+    				PE1_X0_o <= #(`CYCLE*8) x_r1_o;
+    				PE1_Y0_o <= #(`CYCLE*8) x_r2_o;
+    				PE1_X1_o <= #(`CYCLE*8) y_r1_o;
+    				PE1_Y1_o <= #(`CYCLE*8) y_r2_o;
     			end
     			2'd3: begin
     				x_r1_i = PE1_X0_i;
@@ -165,10 +165,10 @@ module PEs(
     				y_r2_i = PE1_Y1_i;
     				d1_i = d1_o;
     				d2_i = d1_o;
-    				PE1_X0_o = #(`CYCLE*8) x_r1_o;
-    				PE1_Y0_o = #(`CYCLE*8) x_r2_o;
-    				PE1_X1_o = #(`CYCLE*8) y_r1_o;
-    				PE1_Y1_o = #(`CYCLE*8) y_r2_o;
+    				PE1_X0_o <= #(`CYCLE*8) x_r1_o;
+    				PE1_Y0_o <= #(`CYCLE*8) x_r2_o;
+    				PE1_X1_o <= #(`CYCLE*8) y_r1_o;
+    				PE1_Y1_o <= #(`CYCLE*8) y_r2_o;
     			end
     		endcase
     	end
@@ -190,23 +190,28 @@ module vector(x_i,y_i,x_o,y_o,d_o);
 	reg sign;
 	integer i;
 
+	wire signed [14:0] K = 15'sb010011011011101;
+	reg [15+BITWIDTH-1:0] scale_X, scale_Y;
+
 	always@(*) begin
 		X[0] = x_i;
 		Y[0] = y_i;
 		for(i = 1; i < CORDIC_NUM + 1; i = i + 1) begin
-			sign = X[i][BITWIDTH-1] ^ Y[i][BITWIDTH-1];
+			sign = X[i-1][BITWIDTH-1] ^ Y[i-1][BITWIDTH-1];
 			if(sign) begin
-				X[i] = X[i-1] - Y[i-1] >>> (i-1);
-				Y[i] = Y[i-1] + X[i-1] >>> (i-1);
+				X[i] = X[i-1] - (Y[i-1] >>> (i-1));
+				Y[i] = Y[i-1] + (X[i-1] >>> (i-1));
 			end
 			else begin
-				X[i] = X[i-1] + Y[i-1] >>> (i-1);
-				Y[i] = Y[i-1] - X[i-1] >>> (i-1);
+				X[i] = X[i-1] + (Y[i-1] >>> (i-1));
+				Y[i] = Y[i-1] - (X[i-1] >>> (i-1));
 			end
 			d_o[i-1] = sign;
 		end
-		x_o = X[CORDIC_NUM];
-		y_o = Y[CORDIC_NUM];
+		scale_X = X[CORDIC_NUM] * K;
+		scale_Y = Y[CORDIC_NUM] * K;
+		x_o = {scale_X[15+BITWIDTH-1], scale_X[15+BITWIDTH-3:BITWIDTH-4]} + scale_X[BITWIDTH-5];
+		y_o = {scale_Y[15+BITWIDTH-1], scale_Y[15+BITWIDTH-3:BITWIDTH-4]} + scale_Y[BITWIDTH-5];
 	end
 endmodule
 
@@ -224,21 +229,27 @@ module rotate(x_i,y_i,x_o,y_o,d_i);
 	reg sign;
 	integer i;
 
+	wire signed [14:0] K = 15'sb010011011011101;
+	reg [15+BITWIDTH-1:0] scale_X, scale_Y;
+
 	always@(*) begin
 		X[0] = x_i;
 		Y[0] = y_i;
 		for(i = 1; i < CORDIC_NUM + 1; i = i + 1) begin
 			sign = d_i[i-1];
 			if(sign) begin
-				X[i] = X[i-1] - Y[i-1] >>> (i-1);
-				Y[i] = Y[i-1] + X[i-1] >>> (i-1);
+				X[i] = X[i-1] - (Y[i-1] >>> (i-1));
+				Y[i] = Y[i-1] + (X[i-1] >>> (i-1));
 			end
 			else begin
-				X[i] = X[i-1] + Y[i-1] >>> (i-1);
-				Y[i] = Y[i-1] - X[i-1] >>> (i-1);
+				X[i] = X[i-1] + (Y[i-1] >>> (i-1));
+				Y[i] = Y[i-1] - (X[i-1] >>> (i-1));
 			end
 		end
-		x_o = X[CORDIC_NUM];
-		y_o = Y[CORDIC_NUM];
+		scale_X = X[CORDIC_NUM] * K;
+		scale_Y = Y[CORDIC_NUM] * K;
+		x_o = {scale_X[15+BITWIDTH-1], scale_X[15+BITWIDTH-3:BITWIDTH-4]} + scale_X[BITWIDTH-5];
+		y_o = {scale_Y[15+BITWIDTH-1], scale_Y[15+BITWIDTH-3:BITWIDTH-4]} + scale_Y[BITWIDTH-5];
+
 	end
 endmodule

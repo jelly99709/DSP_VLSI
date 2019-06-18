@@ -62,13 +62,13 @@ module TOP(
 		.PE0_scheme_i(pe0_scheme),
 		.PE1_scheme_i(pe1_scheme),
 		.PE0_X0_i(pe0_x0_i), .PE0_Y0_i(pe0_y0_i),
-		.PE0_X1_i(pe0_x1_i), .PE0_Y1_i(pe0_x1_i),
-		.PE1_X0_i(pe1_x0_i), .PE1_Y0_i(pe1_x0_i),
-		.PE1_X1_i(pe1_x1_i), .PE1_Y1_i(pe1_x1_i),
+		.PE0_X1_i(pe0_x1_i), .PE0_Y1_i(pe0_y1_i),
+		.PE1_X0_i(pe1_x0_i), .PE1_Y0_i(pe1_y0_i),
+		.PE1_X1_i(pe1_x1_i), .PE1_Y1_i(pe1_y1_i),
 		.PE0_X0_o(pe0_x0_o), .PE0_Y0_o(pe0_y0_o),
-		.PE0_X1_o(pe0_x1_o), .PE0_Y1_o(pe0_x1_o),
-		.PE1_X0_o(pe1_x0_o), .PE1_Y0_o(pe1_x0_o),
-		.PE1_X1_o(pe1_x1_o), .PE1_Y1_o(pe1_x1_o)
+		.PE0_X1_o(pe0_x1_o), .PE0_Y1_o(pe0_y1_o),
+		.PE1_X0_o(pe1_x0_o), .PE1_Y0_o(pe1_y0_o),
+		.PE1_X1_o(pe1_x1_o), .PE1_Y1_o(pe1_y1_o)
 		);
 
 	//state transfer
@@ -358,6 +358,7 @@ module TOP(
 				endcase
 			end
 			SEND: begin
+				cnt_n = cnt + 1;
 				R_o = dataR[cnt];
 				I_o = dataI[cnt];
 				valid_o_n = cnt == 4'd15 ? 0 : 1;
