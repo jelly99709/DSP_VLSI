@@ -21,7 +21,7 @@
 
 module x4_test;
 
-	parameter CHANNEL_SIZE = 4*4;
+	parameter CHANNEL_SIZE = 16;
 	parameter ROTATION_NUM = 14;
 	parameter BITNUM = 18;
 
@@ -38,7 +38,7 @@ module x4_test;
 
 	integer i, j, k, err;
 	
-	TOP #(BITNUM, ROTATION_NUM) x4(
+	TOP #(CHANNEL_SIZE, BITNUM, ROTATION_NUM) x4(
         .clk(clk),   
         .rst_n(rst),
         .valid_i(valid_i),
@@ -103,26 +103,28 @@ module x4_test;
 
 	//Output check
 	initial begin
-		while(1) begin: output_check
-			@(negedge clk) begin
-				if(valid_o) begin
-					if(R_o != GoldR[j] || I_o != GoldI[j]) begin
-						err = err + 1;
-						if(R_o != GoldR[j]) begin
-							$display("ERROR!!! Index %d: Expect real %d, Get %d", j, GoldR[j], R_o);
+		begin : output_check
+			while(1) begin
+				@(negedge clk) begin
+					if(valid_o) begin
+						if(R_o != GoldR[j] || I_o != GoldI[j]) begin
+							err = err + 1;
+							if(R_o != GoldR[j]) begin
+								$display("ERROR!!! Index %d: Expect real %d, Get %d", j, GoldR[j], R_o);
+							end
+							if(I_o != GoldI[j]) begin
+								$display("ERROR!!! Index %d: Expect imag %d, Get %d", j, GoldI[j], I_o);
+							end
 						end
-						if(I_o != GoldI[j]) begin
-							$display("ERROR!!! Index %d: Expect imag %d, Get %d", j, GoldI[j], I_o);
-						end
+						j = j + 1;
 					end
-					j = j + 1;
-				end
-				if(j == CHANNEL_SIZE) begin
-					disable output_check;
+					if(j == CHANNEL_SIZE) begin
+						disable output_check;
+					end
 				end
 			end
 		end
-
+		
 		//Finish
 		if(err == 0) begin
 	        $display("=======================The test result is ..... PASS=========================");
@@ -143,6 +145,7 @@ module x4_test;
 		    $display("    FAIL! There are %d errors at functional simulation !    \n", err);
 		    $display("---------- The test result is ..... FAIL -------------------\n");
 	    end
+	    $finish;
 	end
 
 endmodule

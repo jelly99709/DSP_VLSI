@@ -1,3 +1,5 @@
+`include "./PEs_behavior.v"
+
 module TOP(
 	clk,   
 	rst_n,
@@ -74,7 +76,7 @@ module TOP(
 		
 		case(STATE)
 			IDLE:    STATE_N = valid_i ? RECIEVE : IDLE;
-			RECIEVE: STATE_N = ~valid_i ? BIDIAG : IDLE;
+			RECIEVE: STATE_N = ~valid_i ? BIDIAG : RECIEVE;
 			BIDIAG:  STATE_N = PHASE == 5'd19 ? SEND : BIDIAG;
 			SEND:    STATE_N = cnt == CHANNEL_SIZE ? DONE : SEND;
 			DONE:    STATE_N = DONE;
