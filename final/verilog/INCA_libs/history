@@ -1,7 +1,0 @@
-//
-// File created by:  irun
-// Do not modify this file
-
-s1::(18Jun2019:18:36:40):( ncverilog 4x4_test.v 4x4_top.v +define+A +access+r )
-s2::(18Jun2019:18:36:44):( ncverilog 4x4_test.v 4x4_top.v +define+B +access+r )
-s3::(18Jun2019:18:36:49):( ncverilog 4x4_test.v 4x4_top.v +define+C +access+r )
