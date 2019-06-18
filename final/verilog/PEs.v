@@ -1,7 +1,8 @@
 module PEs (
     clk,   
     rst_n,
-    valid_i,
+    PE0_valid_i,
+    PE1_valid_i,
     PE0_scheme_i, 
     PE1_scheme_i,
 
@@ -29,7 +30,8 @@ module PEs (
 
     input clk;
     input rst_n;
-    input [3:0] valid_i;
+    input [1:0] PE0_valid_i;
+    input [1:0] PE1_valid_i;
     input [1:0] PE0_scheme_i; 
     input [1:0] PE1_scheme_i;
     input signed [BITWIDTH-1:0] PE0_X0_i;
@@ -102,7 +104,7 @@ module PEs (
     assign PE1_Y1_o = PE1_Y1_out;
     
 
-    assign PE0_idle   = ~valid_i[3:2];
+    assign PE0_idle   = ~PE0_valid_i;
     assign PE0_scheme = PE0_scheme_i;
     assign PE0_X0_in  = PE0_X0_i;
     assign PE0_Y0_in  = PE0_Y0_i;
@@ -115,7 +117,7 @@ module PEs (
     end
 
 
-    assign PE1_idle   = ~valid_i[1:0];
+    assign PE1_idle   = ~PE1_valid_i;
     assign PE1_scheme = PE1_scheme_i;
     assign PE1_X0_in  = PE1_X0_i;
     assign PE1_Y0_in  = PE1_Y0_i;
@@ -267,12 +269,13 @@ module PE(
 
 
     wire COR_start_0, COR_start_1;
-    wire COR_mode_0, COR_mode_1;
     wire signed [BITWIDTH-1:0] COR_Xin_0, COR_Xin_1;
     wire signed [BITWIDTH-1:0] COR_Yin_0, COR_Yin_1;
+    wire [CORDIC_NUM-1:0] COR_din_0, COR_din_1;
     wire signed [BITWIDTH-1:0] COR_Xout_0, COR_Xout_1;
     wire signed [BITWIDTH-1:0] COR_Yout_0, COR_Yout_1;
     wire [CORDIC_NUM-1:0] COR_dout_0, COR_dout_1;
+    reg COR_mode_0, COR_mode_1;
 
     reg [CORDIC_NUM/2:0]   isswap, isswap_n;
     reg [CORDIC_NUM/2-1:0] a0_val, a0_val_n;
@@ -339,15 +342,23 @@ module PE(
         case(scheme)
             SCHEME0: begin
                 isswap_n[0] = 0;
+                COR_mode_0 = 0;
+                COR_mode_1 = 0;
             end
             SCHEME1: begin
                 isswap_n[0] = 0;
+                COR_mode_0 = 1;
+                COR_mode_1 = 1;
             end
             SCHEME2: begin
                 isswap_n[0] = 1;
+                COR_mode_0 = 0;
+                COR_mode_1 = 1;
             end
             SCHEME3: begin
                 isswap_n[0] = 1;
+                COR_mode_0 = 1;
+                COR_mode_1 = 1;
             end
         endcase
 
@@ -427,13 +438,13 @@ module CORDIC_VR(
 
     // Register
     reg [1:0] state, state_n;
-    reg [CORDIC_NUM/2-1:0] mode, mode_n;
+    reg [CORDIC_NUM/2-2:0] mode, mode_n;
     reg signed [BITWIDTH:0] X_reg   [0:CORDIC_NUM/2];
     reg signed [BITWIDTH:0] X_reg_n [0:CORDIC_NUM/2];
     reg signed [BITWIDTH:0] Y_reg   [0:CORDIC_NUM/2];
     reg signed [BITWIDTH:0] Y_reg_n [0:CORDIC_NUM/2];
-    reg signed [BITWIDTH:0] X_tmp   [0:CORDIC_NUM/2];
-    reg signed [BITWIDTH:0] Y_tmp   [0:CORDIC_NUM/2];
+    reg signed [BITWIDTH:0] X_tmp   [0:CORDIC_NUM/2-1];
+    reg signed [BITWIDTH:0] Y_tmp   [0:CORDIC_NUM/2-1];
 
     wire signed [15+BITWIDTH-1:0] scaling_X, scaling_Y;
 
@@ -441,8 +452,8 @@ module CORDIC_VR(
 
     assign scaling_X = $signed(X_reg[CORDIC_NUM/2-1]) * $signed(K);
     assign scaling_Y = $signed(Y_reg[CORDIC_NUM/2-1]) * $signed(K);
-    assign X_o = X_reg[CORDIC_NUM/2];
-    assign Y_o = Y_reg[CORDIC_NUM/2];
+    assign X_o = X_reg[CORDIC_NUM/2][BITWIDTH-1:0];
+    assign Y_o = Y_reg[CORDIC_NUM/2][BITWIDTH-1:0];
 
     always @(*) begin
 
@@ -455,7 +466,7 @@ module CORDIC_VR(
 
         case (mode_i)
             VECTOR: begin
-                if(X_i[BITWIDTH] ^ Y_i[BITWIDTH]) begin
+                if(X_i[BITWIDTH-1] ^ Y_i[BITWIDTH-1]) begin
                     X_tmp[0] = X_i - Y_i;
                     Y_tmp[0] = Y_i + X_i;
                 end
@@ -479,7 +490,7 @@ module CORDIC_VR(
         for(i=1;i<CORDIC_NUM/2;i=i+1) begin
             case (mode[i-1])
                 VECTOR: begin
-                    if(X_reg[i][BITWIDTH] ^ Y_reg[i][BITWIDTH]) begin
+                    if(X_reg[i-1][BITWIDTH] ^ Y_reg[i-1][BITWIDTH]) begin
                         X_tmp[i] = X_reg[i-1] - (Y_reg[i-1] >>> 2*i);
                         Y_tmp[i] = Y_reg[i-1] + (X_reg[i-1] >>> 2*i);
                     end
@@ -501,8 +512,31 @@ module CORDIC_VR(
             endcase
         end
 
+        case (mode_i)
+            VECTOR: begin
+                if(X_tmp[0][BITWIDTH] ^ Y_tmp[0][BITWIDTH]) begin
+                    X_reg_n[0] = X_tmp[0] - (Y_tmp[0] >>> 1);
+                    Y_reg_n[0] = Y_tmp[0] + (X_tmp[0] >>> 1);
+                end
+                else begin
+                    X_reg_n[0] = X_tmp[0] + (Y_tmp[0] >>> 1);
+                    Y_reg_n[0] = Y_tmp[0] - (X_tmp[0] >>> 1);
+                end
+            end
+            ROTATE: begin
+                if(d_i[1]) begin
+                    X_reg_n[0] = X_tmp[0] - (Y_tmp[0] >>> 1);
+                    Y_reg_n[0] = Y_tmp[0] + (X_tmp[0] >>> 1);
+                end
+                else begin
+                    X_reg_n[0] = X_tmp[0] + (Y_tmp[0] >>> 1);
+                    Y_reg_n[0] = Y_tmp[0] - (X_tmp[0] >>> 1);
+                end
+            end
+        endcase
 
-        for(i=0;i<CORDIC_NUM/2;i=i+1) begin
+
+        for(i=1;i<CORDIC_NUM/2;i=i+1) begin
             case (mode[i-1])
                 VECTOR: begin
                     if(X_tmp[i][BITWIDTH] ^ Y_tmp[i][BITWIDTH]) begin
@@ -539,7 +573,7 @@ module CORDIC_VR(
 
         case (mode_i)
             VECTOR: begin
-                if(X_i[BITWIDTH] ^ Y_i[BITWIDTH]) begin
+                if(X_i[BITWIDTH-1] ^ Y_i[BITWIDTH-1]) begin
                     d_o[0] = 1'b1;
                 end
                 else begin
@@ -585,16 +619,16 @@ module CORDIC_VR(
 
     always @(posedge clk or negedge rst_n) begin
         if(~rst_n) begin
-            for(i=0;i<CORDIC_NUM/2;i=i+1) begin
+            for(i=0;i<CORDIC_NUM/2+1;i=i+1) begin
                 X_reg[i] <= 0;
                 Y_reg[i] <= 0;
             end
             for(i=0;i<CORDIC_NUM/2-1;i=i+1) begin
-                mode[i]  <= 0;
+                mode[i]  <= 6'b111111;
             end
         end 
         else begin
-            for(i=0;i<CORDIC_NUM/2;i=i+1) begin
+            for(i=0;i<CORDIC_NUM/2+1;i=i+1) begin
                 X_reg[i] <= X_reg_n[i];
                 Y_reg[i] <= Y_reg_n[i];
             end
