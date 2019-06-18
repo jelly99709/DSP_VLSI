@@ -1,0 +1,23 @@
+#matlab auto save
+*.asv
+
+#nWave
+nWaveLog/*
+
+#dc_shell
+command.log
+*.svf
+*.X
+
+#ncverilog
+ncverilog.*
+novas.*
+novas_dump.log
+*.fsdb
+signal.rc
+INCA_libs/*
+
+#apr
+*.mr
+*.syn
+*.pvl
