@@ -8,7 +8,7 @@ module TOP(
 	I_o,
 	valid_o
 	);
-
+a
 	parameter CHANNEL_SIZE = 4*4;
 	parameter BIT_NUM = 18;
 	parameter ROTATION_NUM = 14;
