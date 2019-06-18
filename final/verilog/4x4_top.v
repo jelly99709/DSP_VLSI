@@ -1,4 +1,4 @@
-`include "./PEs_behavior.v"
+`include "./PEs.v"
 
 module TOP(
 	clk,   
