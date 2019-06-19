@@ -42,7 +42,7 @@ module x4_test;
 	reg signed [31:0] noise, signal;
 	reg [31:0] noise_energy, signal_energy;
 
-	integer i, j, k, err ,SNR_ratio;
+	integer i, j, k, err , SNR_ratio;
 
 	real abc;
 	
@@ -122,7 +122,7 @@ module x4_test;
 							noise_energy = noise_energy + noise*noise;
 							noise = GoldI[j] - I_o;
 							noise_energy = noise_energy + noise*noise;
-						`elsif
+						`else
 							if(R_o != GoldR[j] || I_o != GoldI[j]) begin
 								err = err + 1;
 								if(R_o != GoldR[j]) begin
@@ -145,7 +145,7 @@ module x4_test;
 		//Finish
 		`ifdef D
 			if(noise_energy == 0) begin
-				$display("SNR = Infinity\n");
+				$display("\nSNR = Infinity\n");
 				$display("=======================The test result is ..... PASS=========================");
 		        $display("\n");
 		        $display("        *************************************************              ");
@@ -160,7 +160,7 @@ module x4_test;
 			end
 			else begin
 				SNR_ratio = signal_energy/noise_energy;
-				$display("SNR = %2.2f\n", $log10(SNR_ratio)*10.0);
+				$display("\nSNR = %2.2f\n", $log10(SNR_ratio)*10.0);
 
 				if(SNR_ratio >= 10000) begin
 					$display("=======================The test result is ..... PASS=========================");
@@ -181,7 +181,7 @@ module x4_test;
 			 		$display("---------- The test result is ..... FAIL -------------------\n");
 				end
 			end
-		`elsif
+		`else
 			if(err == 0) begin
 		        $display("=======================The test result is ..... PASS=========================");
 		        $display("\n");
