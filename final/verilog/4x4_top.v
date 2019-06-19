@@ -1,4 +1,4 @@
-`include "./PEs.v"
+`include "./PEs_behavior.v"
 
 module TOP(
 	clk,   
@@ -77,7 +77,7 @@ module TOP(
 		case(STATE)
 			IDLE:    STATE_N = valid_i ? RECIEVE : IDLE;
 			RECIEVE: STATE_N = ~valid_i ? BIDIAG : RECIEVE;
-			BIDIAG:  STATE_N = PHASE == 5'd19 ? SEND : BIDIAG;
+			BIDIAG:  STATE_N = PHASE == 5'd11 ? SEND : BIDIAG;
 			SEND:    STATE_N = cnt == CHANNEL_SIZE ? DONE : SEND;
 			DONE:    STATE_N = DONE;
 			default: STATE_N = STATE;
@@ -125,7 +125,7 @@ module TOP(
 			BIDIAG: begin
 				PHASE_N = PHASE + 1;
 				cnt_n = 0;
-				valid_o_n = PHASE == 5'd19 ? 1 : 0;
+				valid_o_n = PHASE == 5'd11 ? 1 : 0;
 				case(PHASE)
 					5'd0: begin
 						pe0_valid = 2'b11;
@@ -184,22 +184,6 @@ module TOP(
 						pe1_y1_i = dataI[{2'd3,2'd3}];
 					end
 					5'd4: begin
-						pe0_valid = 2'd00;
-						pe1_valid = 2'd00;
-					end
-					5'd5: begin
-						pe0_valid = 2'd00;
-						pe1_valid = 2'd00;
-					end
-					5'd6: begin
-						pe0_valid = 2'd00;
-						pe1_valid = 2'd00;
-					end
-					5'd7: begin
-						pe0_valid = 2'd00;
-						pe1_valid = 2'd00;
-					end
-					5'd8: begin
 						pe0_valid = 2'b11;
 						pe1_valid = 2'b11;
 						pe0_scheme = REAL_NULLIFIED;
@@ -221,7 +205,7 @@ module TOP(
 						pe1_x1_i = pe1_x1_o;
 						pe1_y1_i = pe1_y1_o;
 					end
-					5'd9: begin
+					5'd5: begin
 						pe0_valid = 2'b11;
 						pe1_valid = 2'b11;
 						pe0_scheme = RELATED_ROTATE;
@@ -243,7 +227,7 @@ module TOP(
 						pe1_x1_i = pe1_x1_o;
 						pe1_y1_i = pe1_y1_o;
 					end
-					5'd10: begin
+					5'd6: begin
 						pe0_valid = 2'b11;
 						pe1_valid = 2'b11;
 						pe0_scheme = REAL_NULLIFIED;
@@ -265,7 +249,7 @@ module TOP(
 						pe1_x1_i = pe1_x0_o;
 						pe1_y1_i = pe1_y0_o;
 					end
-					5'd11: begin
+					5'd7: begin
 						pe0_valid = 2'b11;
 						pe1_valid = 2'b11;
 						pe0_scheme = RELATED_ROTATE;
@@ -287,23 +271,7 @@ module TOP(
 						pe1_x1_i = pe1_x0_o;
 						pe1_y1_i = pe1_y0_o;
 					end
-					5'd12: begin
-						pe0_valid = 2'd00;
-						pe1_valid = 2'd00;
-					end
-					5'd13: begin
-						pe0_valid = 2'd00;
-						pe1_valid = 2'd00;
-					end
-					5'd14: begin
-						pe0_valid = 2'd00;
-						pe1_valid = 2'd00;
-					end
-					5'd15: begin
-						pe0_valid = 2'd00;
-						pe1_valid = 2'd00;
-					end
-					5'd16: begin
+					5'd8: begin
 						pe0_valid = 2'd00;
 						pe1_valid = 2'd00;
 						dataR_n[{2'd0,2'd0}] = pe0_x0_o;
@@ -315,7 +283,7 @@ module TOP(
 						dataR_n[{2'd1,2'd1}] = pe1_x1_o;
 						dataI_n[{2'd1,2'd1}] = pe1_y1_o;
 					end
-					5'd17: begin
+					5'd9: begin
 						pe0_valid = 2'd00;
 						pe1_valid = 2'd00;
 						dataR_n[{2'd0,2'd2}] = pe0_x0_o;
@@ -327,7 +295,7 @@ module TOP(
 						dataR_n[{2'd1,2'd3}] = pe1_x1_o;
 						dataI_n[{2'd1,2'd3}] = pe1_y1_o;
 					end
-					5'd18: begin
+					5'd10: begin
 						pe0_valid = 2'd00;
 						pe1_valid = 2'd00;
 						dataR_n[{2'd2,2'd0}] = pe0_x1_o;
@@ -339,7 +307,7 @@ module TOP(
 						dataR_n[{2'd3,2'd1}] = pe1_x0_o;
 						dataI_n[{2'd3,2'd1}] = pe1_y0_o;
 					end
-					5'd19: begin
+					5'd11: begin
 						pe0_valid = 2'd00;
 						pe1_valid = 2'd00;
 						dataR_n[{2'd2,2'd2}] = pe0_x1_o;

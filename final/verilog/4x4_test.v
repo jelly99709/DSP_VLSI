@@ -5,18 +5,21 @@
 	`define IMAG_PAT "./dat/4x4/patternI_a.dat"
 	`define REAL_GOLD "./dat/4x4/goldenR_a.dat"
 	`define IMAG_GOLD "./dat/4x4/goldenI_a.dat"
-`endif
-`ifdef B
+`elsif B
 	`define REAL_PAT "./dat/4x4/patternR_b.dat"
 	`define IMAG_PAT "./dat/4x4/patternI_b.dat"
 	`define REAL_GOLD "./dat/4x4/goldenR_b.dat"
 	`define IMAG_GOLD "./dat/4x4/goldenI_b.dat"
-`endif
-`ifdef C
+`elsif C
 	`define REAL_PAT "./dat/4x4/patternR_c.dat"
 	`define IMAG_PAT "./dat/4x4/patternI_c.dat"
 	`define REAL_GOLD "./dat/4x4/goldenR_c.dat"
 	`define IMAG_GOLD "./dat/4x4/goldenI_c.dat"
+`elsif D
+	`define REAL_PAT "./dat/bidiag/patternR.dat"
+	`define IMAG_PAT "./dat/bidiag/patternI.dat"
+	`define REAL_GOLD "./dat/bidiag/goldenR.dat"
+	`define IMAG_GOLD "./dat/bidiag/goldenI.dat"
 `endif
 
 module x4_test;
@@ -36,7 +39,12 @@ module x4_test;
 	reg signed [BITNUM-1:0] GoldR [0:CHANNEL_SIZE-1];
 	reg signed [BITNUM-1:0] GoldI [0:CHANNEL_SIZE-1];
 
-	integer i, j, k, err;
+	reg signed [31:0] noise, signal;
+	reg [31:0] noise_energy, signal_energy;
+
+	integer i, j, k, err ,SNR_ratio;
+
+	real abc;
 	
 	TOP #(CHANNEL_SIZE, BITNUM, ROTATION_NUM) x4(
         .clk(clk),   
@@ -65,6 +73,8 @@ module x4_test;
 		j = 0;
 		err = 0;
 		clk = 1;
+		signal_energy = 0;
+		noise_energy = 0;
 	end
 
 	always #(`CYCLE*0.5) begin
@@ -107,15 +117,22 @@ module x4_test;
 			while(1) begin
 				@(negedge clk) begin
 					if(valid_o) begin
-						if(R_o != GoldR[j] || I_o != GoldI[j]) begin
-							err = err + 1;
-							if(R_o != GoldR[j]) begin
-								$display("ERROR!!! Index %d: Expect real %d, Get %d", j, GoldR[j], R_o);
+						`ifdef D
+							noise = GoldR[j] - R_o;
+							noise_energy = noise_energy + noise*noise;
+							noise = GoldI[j] - I_o;
+							noise_energy = noise_energy + noise*noise;
+						`elsif
+							if(R_o != GoldR[j] || I_o != GoldI[j]) begin
+								err = err + 1;
+								if(R_o != GoldR[j]) begin
+									$display("ERROR!!! Index %d: Expect real %d, Get %d", j, GoldR[j], R_o);
+								end
+								if(I_o != GoldI[j]) begin
+									$display("ERROR!!! Index %d: Expect imag %d, Get %d", j, GoldI[j], I_o);
+								end
 							end
-							if(I_o != GoldI[j]) begin
-								$display("ERROR!!! Index %d: Expect imag %d, Get %d", j, GoldI[j], I_o);
-							end
-						end
+						`endif
 						j = j + 1;
 					end
 					if(j == CHANNEL_SIZE) begin
@@ -126,25 +143,64 @@ module x4_test;
 		end
 		
 		//Finish
-		if(err == 0) begin
-	        $display("=======================The test result is ..... PASS=========================");
-	        $display("\n");
-	        $display("        *************************************************              ");
-	        $display("        **                                             **      /|__/|");
-	        $display("        **             Congratulations !!              **     / O,O  \\");
-	        $display("        **                                             **    /_____   \\");
-	        $display("        **  All data have been generated successfully! **   /^ ^ ^ \\  |");
-	        $display("        **                                             **  |^ ^ ^ ^ |w|");
-	        $display("        *************************************************   \\m___m__|_|");
-	        $display("\n");
-	        $display("============================================================================");
-	        $finish;
-	    end
-	    else begin
-	        $display("------------------------------------------------------------\n");
-		    $display("    FAIL! There are %d errors at functional simulation !    \n", err);
-		    $display("---------- The test result is ..... FAIL -------------------\n");
-	    end
+		`ifdef D
+			if(noise_energy == 0) begin
+				$display("SNR = Infinity\n");
+				$display("=======================The test result is ..... PASS=========================");
+		        $display("\n");
+		        $display("        *************************************************              ");
+		        $display("        **                                             **      /|__/|");
+		        $display("        **             Congratulations !!              **     / O,O  \\");
+		        $display("        **                                             **    /_____   \\");
+		        $display("        **  All data have been generated successfully! **   /^ ^ ^ \\  |");
+		        $display("        **                                             **  |^ ^ ^ ^ |w|");
+		        $display("        *************************************************   \\m___m__|_|");
+		        $display("\n");
+		        $display("============================================================================");
+			end
+			else begin
+				SNR_ratio = signal_energy/noise_energy;
+				$display("SNR = %2.2f\n", $log10(SNR_ratio)*10.0);
+
+				if(SNR_ratio >= 10000) begin
+					$display("=======================The test result is ..... PASS=========================");
+			        $display("\n");
+			        $display("        *************************************************              ");
+			        $display("        **                                             **      /|__/|");
+			        $display("        **             Congratulations !!              **     / O,O  \\");
+			        $display("        **                                             **    /_____   \\");
+			        $display("        **  All data have been generated successfully! **   /^ ^ ^ \\  |");
+			        $display("        **                                             **  |^ ^ ^ ^ |w|");
+			        $display("        *************************************************   \\m___m__|_|");
+			        $display("\n");
+			        $display("============================================================================");
+				end
+				else begin
+					$display("------------------------------------------------------------\n");
+			  		$display("        FAIL! SNR < 40dB at functional simulation !         \n");
+			 		$display("---------- The test result is ..... FAIL -------------------\n");
+				end
+			end
+		`elsif
+			if(err == 0) begin
+		        $display("=======================The test result is ..... PASS=========================");
+		        $display("\n");
+		        $display("        *************************************************              ");
+		        $display("        **                                             **      /|__/|");
+		        $display("        **             Congratulations !!              **     / O,O  \\");
+		        $display("        **                                             **    /_____   \\");
+		        $display("        **  All data have been generated successfully! **   /^ ^ ^ \\  |");
+		        $display("        **                                             **  |^ ^ ^ ^ |w|");
+		        $display("        *************************************************   \\m___m__|_|");
+		        $display("\n");
+		        $display("============================================================================");
+		    end
+		    else begin
+		        $display("------------------------------------------------------------\n");
+			    $display("    FAIL! There are %d errors at functional simulation !    \n", err);
+			    $display("---------- The test result is ..... FAIL -------------------\n");
+		    end
+		`endif
 	    $finish;
 	end
 

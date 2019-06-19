@@ -27,6 +27,7 @@ module PEs(
 
 	parameter BITWIDTH   = 18;
     parameter CORDIC_NUM = 14;
+    localparam DELAY = 4;
 
     input clk;
     input rst_n;
@@ -80,10 +81,10 @@ module PEs(
     				y_v1_i = PE0_Y0_i;
     				x_v2_i = PE0_X1_i;
     				y_v2_i = PE0_Y1_i;
-    				PE0_X0_o <= #(`CYCLE*8) x_v1_o;
-    				PE0_Y0_o <= #(`CYCLE*8) y_v1_o;
-    				PE0_X1_o <= #(`CYCLE*8) x_v2_o;
-    				PE0_Y1_o <= #(`CYCLE*8) y_v2_o;
+    				PE0_X0_o <= #(`CYCLE*DELAY) x_v1_o;
+    				PE0_Y0_o <= #(`CYCLE*DELAY) y_v1_o;
+    				PE0_X1_o <= #(`CYCLE*DELAY) x_v2_o;
+    				PE0_Y1_o <= #(`CYCLE*DELAY) y_v2_o;
     			end
     			2'd1: begin
     				x_r3_i = PE0_X0_i;
@@ -92,10 +93,10 @@ module PEs(
     				y_r4_i = PE0_Y1_i;
     				d3_i = d1_o;
     				d4_i = d2_o;
-    				PE0_X0_o <= #(`CYCLE*8) x_r3_o;
-    				PE0_Y0_o <= #(`CYCLE*8) y_r3_o;
-    				PE0_X1_o <= #(`CYCLE*8) x_r4_o;
-    				PE0_Y1_o <= #(`CYCLE*8) y_r4_o;
+    				PE0_X0_o <= #(`CYCLE*DELAY) x_r3_o;
+    				PE0_Y0_o <= #(`CYCLE*DELAY) y_r3_o;
+    				PE0_X1_o <= #(`CYCLE*DELAY) x_r4_o;
+    				PE0_Y1_o <= #(`CYCLE*DELAY) y_r4_o;
     			end
     			2'd2: begin
     				x_v1_i = PE0_X0_i;
@@ -103,10 +104,10 @@ module PEs(
     				x_r3_i = PE0_Y0_i;
     				y_r3_i = PE0_Y1_i;
     				d3_i = d1_o;
-    				PE0_X0_o <= #(`CYCLE*8) x_v1_o;
-    				PE0_Y0_o <= #(`CYCLE*8) x_r3_o;
-    				PE0_X1_o <= #(`CYCLE*8) y_v1_o;
-    				PE0_Y1_o <= #(`CYCLE*8) y_r3_o;
+    				PE0_X0_o <= #(`CYCLE*DELAY) x_v1_o;
+    				PE0_Y0_o <= #(`CYCLE*DELAY) x_r3_o;
+    				PE0_X1_o <= #(`CYCLE*DELAY) y_v1_o;
+    				PE0_Y1_o <= #(`CYCLE*DELAY) y_r3_o;
     			end
     			2'd3: begin
     				x_r4_i = PE0_X0_i;
@@ -115,10 +116,10 @@ module PEs(
     				y_r3_i = PE0_Y1_i;
     				d3_i = d1_o;
     				d4_i = d1_o;
-    				PE0_X0_o <= #(`CYCLE*8) x_r4_o;
-    				PE0_Y0_o <= #(`CYCLE*8) x_r3_o;
-    				PE0_X1_o <= #(`CYCLE*8) y_r4_o;
-    				PE0_Y1_o <= #(`CYCLE*8) y_r3_o;
+    				PE0_X0_o <= #(`CYCLE*DELAY) x_r4_o;
+    				PE0_Y0_o <= #(`CYCLE*DELAY) x_r3_o;
+    				PE0_X1_o <= #(`CYCLE*DELAY) y_r4_o;
+    				PE0_Y1_o <= #(`CYCLE*DELAY) y_r3_o;
     			end
     		endcase
     		case(PE1_scheme_i)
@@ -129,10 +130,10 @@ module PEs(
     				y_r2_i = PE1_Y1_i;
     				d1_i = d1_o;
     				d2_i = d2_o;
-    				PE1_X0_o <= #(`CYCLE*8) x_r1_o;
-    				PE1_Y0_o <= #(`CYCLE*8) y_r1_o;
-    				PE1_X1_o <= #(`CYCLE*8) x_r2_o;
-    				PE1_Y1_o <= #(`CYCLE*8) y_r2_o;
+    				PE1_X0_o <= #(`CYCLE*DELAY) x_r1_o;
+    				PE1_Y0_o <= #(`CYCLE*DELAY) y_r1_o;
+    				PE1_X1_o <= #(`CYCLE*DELAY) x_r2_o;
+    				PE1_Y1_o <= #(`CYCLE*DELAY) y_r2_o;
     			end
     			2'd1: begin
     				x_r1_i = PE1_X0_i;
@@ -141,10 +142,10 @@ module PEs(
     				y_r2_i = PE1_Y1_i;
     				d1_i = d1_o;
     				d2_i = d2_o;
-    				PE1_X0_o <= #(`CYCLE*8) x_r1_o;
-    				PE1_Y0_o <= #(`CYCLE*8) y_r1_o;
-    				PE1_X1_o <= #(`CYCLE*8) x_r2_o;
-    				PE1_Y1_o <= #(`CYCLE*8) y_r2_o;
+    				PE1_X0_o <= #(`CYCLE*DELAY) x_r1_o;
+    				PE1_Y0_o <= #(`CYCLE*DELAY) y_r1_o;
+    				PE1_X1_o <= #(`CYCLE*DELAY) x_r2_o;
+    				PE1_Y1_o <= #(`CYCLE*DELAY) y_r2_o;
     			end
     			2'd2: begin
     				x_r1_i = PE1_X0_i;
@@ -153,10 +154,10 @@ module PEs(
     				y_r2_i = PE1_Y1_i;
     				d1_i = d1_o;
     				d2_i = d1_o;
-    				PE1_X0_o <= #(`CYCLE*8) x_r1_o;
-    				PE1_Y0_o <= #(`CYCLE*8) x_r2_o;
-    				PE1_X1_o <= #(`CYCLE*8) y_r1_o;
-    				PE1_Y1_o <= #(`CYCLE*8) y_r2_o;
+    				PE1_X0_o <= #(`CYCLE*DELAY) x_r1_o;
+    				PE1_Y0_o <= #(`CYCLE*DELAY) x_r2_o;
+    				PE1_X1_o <= #(`CYCLE*DELAY) y_r1_o;
+    				PE1_Y1_o <= #(`CYCLE*DELAY) y_r2_o;
     			end
     			2'd3: begin
     				x_r1_i = PE1_X0_i;
@@ -165,10 +166,10 @@ module PEs(
     				y_r2_i = PE1_Y1_i;
     				d1_i = d1_o;
     				d2_i = d1_o;
-    				PE1_X0_o <= #(`CYCLE*8) x_r1_o;
-    				PE1_Y0_o <= #(`CYCLE*8) x_r2_o;
-    				PE1_X1_o <= #(`CYCLE*8) y_r1_o;
-    				PE1_Y1_o <= #(`CYCLE*8) y_r2_o;
+    				PE1_X0_o <= #(`CYCLE*DELAY) x_r1_o;
+    				PE1_Y0_o <= #(`CYCLE*DELAY) x_r2_o;
+    				PE1_X1_o <= #(`CYCLE*DELAY) y_r1_o;
+    				PE1_Y1_o <= #(`CYCLE*DELAY) y_r2_o;
     			end
     		endcase
     	end
