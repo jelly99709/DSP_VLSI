@@ -723,8 +723,8 @@ module CORDIC_VR(
             mode_n[i] = mode[i-1];
         end
 
-        X_reg_n[PIPE_NUM-1] = {1'b0,{scaling_X[15+BITWIDTH-1], scaling_X[15+BITWIDTH-3:BITWIDTH-4]} + scaling_X[BITWIDTH-5]};
-        Y_reg_n[PIPE_NUM-1] = {1'b0,{scaling_Y[15+BITWIDTH-1], scaling_Y[15+BITWIDTH-3:BITWIDTH-4]} + scaling_Y[BITWIDTH-5]};
+        X_reg_n[PIPE_NUM-1] = {1'b0,{scaling_X[15+BITWIDTH-1], scaling_X[15+BITWIDTH-3:BITWIDTH-4]}};//+ scaling_X[BITWIDTH-5]};
+        Y_reg_n[PIPE_NUM-1] = {1'b0,{scaling_Y[15+BITWIDTH-1], scaling_Y[15+BITWIDTH-3:BITWIDTH-4]}};//+ scaling_Y[BITWIDTH-5]};
     end
 
     always @(*) begin
