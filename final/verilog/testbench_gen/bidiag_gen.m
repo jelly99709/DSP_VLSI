@@ -100,7 +100,7 @@ snr = SNR(H_bi.double,T_bi);
 fprintf('SNR = %f\n',snr);
 
 %% Generated pattern
-%{
+
 fileR = fopen('../dat/bidiag/patternR.dat','w');
 fileI = fopen('../dat/bidiag/patternI.dat','w');
 goldR = fopen('../dat/bidiag/goldenR.dat','w');
@@ -114,15 +114,15 @@ for x = 1:4
         val = H_i(x,y);
         fprintf(fileI, val.bin);
         fprintf(fileI,'\n');
-        val = real(H_bi(x,y));
+        val = real(H_concat(x, y));
         fprintf(goldR, val.bin);
         fprintf(goldR,'\n');
-        val = imag(H_bi(x,y));
+        val = imag(H_concat(x, y+col_num));
         fprintf(goldI, val.bin);
         fprintf(goldI,'\n');
     end
 end
-%}
+
 %% Subfunction definition
 function s = SNR(test, gold)
     s = 10*log10(sum(abs(test)^2)/sum(abs(test-gold)^2));
