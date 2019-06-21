@@ -1,4 +1,4 @@
-module PEs_v2 (
+module PEs(
     clk,   
     rst_n,
     PE0_valid_i,

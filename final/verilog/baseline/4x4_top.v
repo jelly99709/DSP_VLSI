@@ -85,9 +85,9 @@ module TOP(
     integer i;
     
     localparam BIDEND = 7'd67;
-    assign diag_end = (sw_num == MAXSWEEP-1) && (DIAG_STATE[4:1] == 4'd7);
+    assign diag_end = (sw_num == MAXSWEEP-1) && (DIAG_STATE == 5'd15);
 
-    PEs_v2 unit(
+    PEs unit(
         .clk(clk),
         .rst_n(rst_n),
         .PE0_valid_i(pe0_valid),
@@ -132,7 +132,7 @@ module TOP(
         case(STATE)
             IDLE:    STATE_N = valid_i ? RECIEVE : IDLE;
             RECIEVE: STATE_N = ~valid_i ? BIDIAG : RECIEVE;
-            BIDIAG:  STATE_N = (PHASE == BIDEND) ? SEND : BIDIAG;
+            BIDIAG:  STATE_N = (PHASE == BIDEND) ? DIAG : BIDIAG;
             DIAG:    STATE_N = (diag_end) ? SEND:DIAG;
             SEND:    STATE_N = (cnt == CHANNEL_SIZE) ? DONE : SEND;
             DONE:    STATE_N = DONE;
@@ -185,7 +185,7 @@ module TOP(
             BIDIAG: begin
                 PHASE_N = PHASE + 1;
                 cnt_n = 0;
-                valid_o_n = (PHASE == BIDEND) ? 2'b01 : 2'b00;
+                valid_o_n = 2'b00;
                 case(PHASE)
                     7'd0: begin
                         pe0_valid = 2'b11;
@@ -1086,6 +1086,7 @@ module TOP(
                             DPHASE_N = 0;
                             cnt_n = cnt + 1;
                         end
+
                         else if(cnt[1:0] == 2'b11) begin
                             pe0_valid = 2'b00;
                             pe1_valid = 2'b00;
@@ -2381,12 +2382,392 @@ module TOP(
                 endcase
             end
             DIAG: begin
-                for(i = 0; i < CHANNEL_SIZE; i = i + 1) begin
-                    lvec_dataR_n[i] = lvec_dataR[i];
-                    lvec_dataI_n[i] = lvec_dataI[i];
-                    rvec_dataR_n[i] = rvec_dataR[i];
-                    rvec_dataI_n[i] = rvec_dataI[i];
-                end 
+                valid_o_n = (diag_end) ? 1 : 0;
+                case (DPHASE)
+                    1'b0: begin
+                        sw_num_n = sw_num;
+                        case(cnt[1:0])
+
+                            2'b00: begin
+                                inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                vec_pe0_x0_i = rvec_dataR[{2'd0,2'd0}];
+                                vec_pe0_y0_i = rvec_dataI[{2'd0,2'd0}];
+                                vec_pe0_x1_i = rvec_dataR[{2'd0,2'd1}];
+                                vec_pe0_y1_i = rvec_dataI[{2'd0,2'd1}];
+                                vec_pe1_x0_i = rvec_dataR[{2'd1,2'd0}];
+                                vec_pe1_y0_i = rvec_dataI[{2'd1,2'd0}];
+                                vec_pe1_x1_i = rvec_dataR[{2'd1,2'd1}];
+                                vec_pe1_y1_i = rvec_dataI[{2'd1,2'd1}];
+                                DPHASE_N = 0;
+                                cnt_n = cnt + 1;
+                            end
+                            2'b01: begin
+                                inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                vec_pe0_x0_i = rvec_dataR[{2'd2,2'd0}];
+                                vec_pe0_y0_i = rvec_dataI[{2'd2,2'd0}];
+                                vec_pe0_x1_i = rvec_dataR[{2'd2,2'd1}];
+                                vec_pe0_y1_i = rvec_dataI[{2'd2,2'd1}];
+                                vec_pe1_x0_i = rvec_dataR[{2'd3,2'd0}];
+                                vec_pe1_y0_i = rvec_dataI[{2'd3,2'd0}];
+                                vec_pe1_x1_i = rvec_dataR[{2'd3,2'd1}];
+                                vec_pe1_y1_i = rvec_dataI[{2'd3,2'd1}];
+                                DPHASE_N = 0;
+                                cnt_n = cnt + 1;
+                            end
+                            2'b10: begin
+                                vec_pe0_valid = 2'b00;
+                                vec_pe1_valid = 2'b00;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                DPHASE_N = 0;
+                                cnt_n = cnt + 1;
+                            end
+                            2'b11: begin
+                                vec_pe0_valid = 2'b00;
+                                vec_pe1_valid = 2'b00;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                DPHASE_N = 1;
+                                cnt_n = 0;
+                            end
+                        endcase
+
+                    end
+                    1'b1: begin
+                        DPHASE_N = 1;
+                        cnt_n = 0;
+                        if(DIAG_STATE == 5'd19) begin
+                            DIAG_STATE_N = 5'd0;
+                            sw_num_n = sw_num + 1;
+                        end
+                        else begin
+                            DIAG_STATE_N = DIAG_STATE + 1;
+                            sw_num_n = sw_num;
+                        end
+
+                        case (DIAG_STATE[4:0])
+                            5'd0: begin
+                                inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                rvec_dataR_n[{2'd0,2'd0}] = vec_pe0_x0_o;
+                                rvec_dataI_n[{2'd0,2'd0}] = vec_pe0_y0_o;
+                                rvec_dataR_n[{2'd0,2'd1}] = vec_pe0_x1_o;
+                                rvec_dataI_n[{2'd0,2'd1}] = vec_pe0_y1_o;
+                                rvec_dataR_n[{2'd1,2'd0}] = vec_pe1_x0_o;
+                                rvec_dataI_n[{2'd1,2'd0}] = vec_pe1_y0_o;
+                                rvec_dataR_n[{2'd1,2'd1}] = vec_pe1_x1_o;
+                                rvec_dataI_n[{2'd1,2'd1}] = vec_pe1_y1_o;
+                                vec_pe0_x0_i = vec_pe0_x1_o;
+                                vec_pe0_y0_i = vec_pe0_y1_o;
+                                vec_pe0_x1_i = rvec_dataR[{2'd0,2'd2}];
+                                vec_pe0_y1_i = rvec_dataI[{2'd0,2'd2}];
+                                vec_pe1_x0_i = vec_pe1_x1_o;
+                                vec_pe1_y0_i = vec_pe1_y1_o;
+                                vec_pe1_x1_i = rvec_dataR[{2'd1,2'd2}];
+                                vec_pe1_y1_i = rvec_dataI[{2'd1,2'd2}];
+                            end
+                            5'd1: begin
+                                inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                rvec_dataR_n[{2'd2,2'd0}] = vec_pe0_x0_o;
+                                rvec_dataI_n[{2'd2,2'd0}] = vec_pe0_y0_o;
+                                rvec_dataR_n[{2'd2,2'd1}] = vec_pe0_x1_o;
+                                rvec_dataI_n[{2'd2,2'd1}] = vec_pe0_y1_o;
+                                rvec_dataR_n[{2'd3,2'd0}] = vec_pe1_x0_o;
+                                rvec_dataI_n[{2'd3,2'd0}] = vec_pe1_y0_o;
+                                rvec_dataR_n[{2'd3,2'd1}] = vec_pe1_x1_o;
+                                rvec_dataI_n[{2'd3,2'd1}] = vec_pe1_y1_o;
+                                vec_pe0_x0_i = vec_pe0_x1_o;
+                                vec_pe0_y0_i = vec_pe0_y1_o;
+                                vec_pe0_x1_i = rvec_dataR[{2'd2,2'd2}];
+                                vec_pe0_y1_i = rvec_dataI[{2'd2,2'd2}];
+                                vec_pe1_x0_i = vec_pe1_x1_o;
+                                vec_pe1_y0_i = vec_pe1_y1_o;
+                                vec_pe1_x1_i = rvec_dataR[{2'd3,2'd2}];
+                                vec_pe1_y1_i = rvec_dataI[{2'd3,2'd2}];
+                            end
+                            
+                            5'd4: begin
+                                inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                rvec_dataR_n[{2'd0,2'd1}] = vec_pe0_x0_o;
+                                rvec_dataI_n[{2'd0,2'd1}] = vec_pe0_y0_o;
+                                rvec_dataR_n[{2'd0,2'd2}] = vec_pe0_x1_o;
+                                rvec_dataI_n[{2'd0,2'd2}] = vec_pe0_y1_o;
+                                rvec_dataR_n[{2'd1,2'd1}] = vec_pe1_x0_o;
+                                rvec_dataI_n[{2'd1,2'd1}] = vec_pe1_y0_o;
+                                rvec_dataR_n[{2'd1,2'd2}] = vec_pe1_x1_o;
+                                rvec_dataI_n[{2'd1,2'd2}] = vec_pe1_y1_o;
+                                vec_pe0_x0_i = vec_pe0_x1_o;
+                                vec_pe0_y0_i = vec_pe0_y1_o;
+                                vec_pe0_x1_i = rvec_dataR[{2'd0,2'd3}];
+                                vec_pe0_y1_i = rvec_dataI[{2'd0,2'd3}];
+                                vec_pe1_x0_i = vec_pe1_x1_o;
+                                vec_pe1_y0_i = vec_pe1_y1_o;
+                                vec_pe1_x1_i = rvec_dataR[{2'd1,2'd3}];
+                                vec_pe1_y1_i = rvec_dataI[{2'd1,2'd3}];
+                            end
+                            5'd5: begin
+                            	inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                rvec_dataR_n[{2'd2,2'd1}] = vec_pe0_x0_o;
+                                rvec_dataI_n[{2'd2,2'd1}] = vec_pe0_y0_o;
+                                rvec_dataR_n[{2'd2,2'd2}] = vec_pe0_x1_o;
+                                rvec_dataI_n[{2'd2,2'd2}] = vec_pe0_y1_o;
+                                rvec_dataR_n[{2'd3,2'd1}] = vec_pe1_x0_o;
+                                rvec_dataI_n[{2'd3,2'd1}] = vec_pe1_y0_o;
+                                rvec_dataR_n[{2'd3,2'd2}] = vec_pe1_x1_o;
+                                rvec_dataI_n[{2'd3,2'd2}] = vec_pe1_y1_o;
+                                
+                                vec_pe0_x0_i = vec_pe0_x1_o;
+                                vec_pe0_y0_i = vec_pe0_y1_o;
+                                vec_pe0_x1_i = rvec_dataR[{2'd2,2'd3}];
+                                vec_pe0_y1_i = rvec_dataI[{2'd2,2'd3}];
+                                vec_pe1_x0_i = vec_pe1_x1_o;
+                                vec_pe1_y0_i = vec_pe1_y1_o;
+                                vec_pe1_x1_i = rvec_dataR[{2'd3,2'd3}];
+                                vec_pe1_y1_i = rvec_dataI[{2'd3,2'd3}];
+                            end
+                            5'd6: begin
+                            	inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                vec_pe0_x0_i = lvec_dataR[{2'd0,2'd0}];
+                                vec_pe0_y0_i = lvec_dataI[{2'd0,2'd0}];
+                                vec_pe0_x1_i = lvec_dataR[{2'd0,2'd1}];
+                                vec_pe0_y1_i = lvec_dataI[{2'd0,2'd1}];
+                                vec_pe1_x0_i = lvec_dataR[{2'd1,2'd0}];
+                                vec_pe1_y0_i = lvec_dataI[{2'd1,2'd0}];
+                                vec_pe1_x1_i = lvec_dataR[{2'd1,2'd1}];
+                                vec_pe1_y1_i = lvec_dataI[{2'd1,2'd1}];
+                            end
+                            5'd7: begin
+                            	inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                vec_pe0_x0_i = lvec_dataR[{2'd2,2'd0}];
+                                vec_pe0_y0_i = lvec_dataI[{2'd2,2'd0}];
+                                vec_pe0_x1_i = lvec_dataR[{2'd2,2'd1}];
+                                vec_pe0_y1_i = lvec_dataI[{2'd2,2'd1}];
+                                vec_pe1_x0_i = lvec_dataR[{2'd3,2'd0}];
+                                vec_pe1_y0_i = lvec_dataI[{2'd3,2'd0}];
+                                vec_pe1_x1_i = lvec_dataR[{2'd3,2'd1}];
+                                vec_pe1_y1_i = lvec_dataI[{2'd3,2'd1}];
+                            end
+                            5'd8: begin
+                                vec_pe0_valid = 2'b00;
+                                vec_pe1_valid = 2'b00;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                rvec_dataR_n[{2'd0,2'd2}] = vec_pe0_x0_o;
+                                rvec_dataI_n[{2'd0,2'd2}] = vec_pe0_y0_o;
+                                rvec_dataR_n[{2'd0,2'd3}] = vec_pe0_x1_o;
+                                rvec_dataI_n[{2'd0,2'd3}] = vec_pe0_y1_o;
+                                rvec_dataR_n[{2'd1,2'd2}] = vec_pe1_x0_o;
+                                rvec_dataI_n[{2'd1,2'd2}] = vec_pe1_y0_o;
+                                rvec_dataR_n[{2'd1,2'd3}] = vec_pe1_x1_o;
+                                rvec_dataI_n[{2'd1,2'd3}] = vec_pe1_y1_o;
+                            end
+                            5'd9: begin
+                            	vec_pe0_valid = 2'b00;
+                                vec_pe1_valid = 2'b00;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                rvec_dataR_n[{2'd2,2'd2}] = vec_pe0_x0_o;
+                                rvec_dataI_n[{2'd2,2'd2}] = vec_pe0_y0_o;
+                                rvec_dataR_n[{2'd2,2'd3}] = vec_pe0_x1_o;
+                                rvec_dataI_n[{2'd2,2'd3}] = vec_pe0_y1_o;
+                                rvec_dataR_n[{2'd3,2'd2}] = vec_pe1_x0_o;
+                                rvec_dataI_n[{2'd3,2'd2}] = vec_pe1_y0_o;
+                                rvec_dataR_n[{2'd3,2'd3}] = vec_pe1_x1_o;
+                                rvec_dataI_n[{2'd3,2'd3}] = vec_pe1_y1_o;
+                            end
+                            5'd10: begin
+                            	inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                lvec_dataR_n[{2'd0,2'd0}] = vec_pe0_x0_o;
+                                lvec_dataI_n[{2'd0,2'd0}] = vec_pe0_y0_o;
+                                lvec_dataR_n[{2'd0,2'd1}] = vec_pe0_x1_o;
+                                lvec_dataI_n[{2'd0,2'd1}] = vec_pe0_y1_o;
+                                lvec_dataR_n[{2'd1,2'd0}] = vec_pe1_x0_o;
+                                lvec_dataI_n[{2'd1,2'd0}] = vec_pe1_y0_o;
+                                lvec_dataR_n[{2'd1,2'd1}] = vec_pe1_x1_o;
+                                lvec_dataI_n[{2'd1,2'd1}] = vec_pe1_y1_o;
+                                vec_pe0_x0_i = vec_pe0_x1_o;
+                                vec_pe0_y0_i = vec_pe0_y1_o;
+                                vec_pe0_x1_i = lvec_dataR[{2'd0,2'd2}];
+                                vec_pe0_y1_i = lvec_dataI[{2'd0,2'd2}];
+                                vec_pe1_x0_i = vec_pe1_x1_o;
+                                vec_pe1_y0_i = vec_pe1_y1_o;
+                                vec_pe1_x1_i = lvec_dataR[{2'd1,2'd2}];
+                                vec_pe1_y1_i = lvec_dataI[{2'd1,2'd2}];
+                            end
+                            5'd11: begin
+                            	inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                lvec_dataR_n[{2'd2,2'd0}] = vec_pe0_x0_o;
+                                lvec_dataI_n[{2'd2,2'd0}] = vec_pe0_y0_o;
+                                lvec_dataR_n[{2'd2,2'd1}] = vec_pe0_x1_o;
+                                lvec_dataI_n[{2'd2,2'd1}] = vec_pe0_y1_o;
+                                lvec_dataR_n[{2'd3,2'd0}] = vec_pe1_x0_o;
+                                lvec_dataI_n[{2'd3,2'd0}] = vec_pe1_y0_o;
+                                lvec_dataR_n[{2'd3,2'd1}] = vec_pe1_x1_o;
+                                lvec_dataI_n[{2'd3,2'd1}] = vec_pe1_y1_o;
+                                vec_pe0_x0_i = vec_pe0_x1_o;
+                                vec_pe0_y0_i = vec_pe0_y1_o;
+                                vec_pe0_x1_i = lvec_dataR[{2'd2,2'd2}];
+                                vec_pe0_y1_i = lvec_dataI[{2'd2,2'd2}];
+                                vec_pe1_x0_i = vec_pe1_x1_o;
+                                vec_pe1_y0_i = vec_pe1_y1_o;
+                                vec_pe1_x1_i = lvec_dataR[{2'd3,2'd2}];
+                                vec_pe1_y1_i = lvec_dataI[{2'd3,2'd2}];
+                            end
+
+                            5'd14: begin
+                                inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                lvec_dataR_n[{2'd0,2'd1}] = vec_pe0_x0_o;
+                                lvec_dataI_n[{2'd0,2'd1}] = vec_pe0_y0_o;
+                                lvec_dataR_n[{2'd0,2'd2}] = vec_pe0_x1_o;
+                                lvec_dataI_n[{2'd0,2'd2}] = vec_pe0_y1_o;
+                                lvec_dataR_n[{2'd1,2'd1}] = vec_pe1_x0_o;
+                                lvec_dataI_n[{2'd1,2'd1}] = vec_pe1_y0_o;
+                                lvec_dataR_n[{2'd1,2'd2}] = vec_pe1_x1_o;
+                                lvec_dataI_n[{2'd1,2'd2}] = vec_pe1_y1_o;
+                                vec_pe0_x0_i = vec_pe0_x1_o;
+                                vec_pe0_y0_i = vec_pe0_y1_o;
+                                vec_pe0_x1_i = lvec_dataR[{2'd0,2'd3}];
+                                vec_pe0_y1_i = lvec_dataI[{2'd0,2'd3}];
+                                vec_pe1_x0_i = vec_pe1_x1_o;
+                                vec_pe1_y0_i = vec_pe1_y1_o;
+                                vec_pe1_x1_i = lvec_dataR[{2'd1,2'd3}];
+                                vec_pe1_y1_i = lvec_dataI[{2'd1,2'd3}];
+                            end
+                            5'd15: begin
+                            	inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                lvec_dataR_n[{2'd2,2'd1}] = vec_pe0_x0_o;
+                                lvec_dataI_n[{2'd2,2'd1}] = vec_pe0_y0_o;
+                                lvec_dataR_n[{2'd2,2'd2}] = vec_pe0_x1_o;
+                                lvec_dataI_n[{2'd2,2'd2}] = vec_pe0_y1_o;
+                                lvec_dataR_n[{2'd3,2'd1}] = vec_pe1_x0_o;
+                                lvec_dataI_n[{2'd3,2'd1}] = vec_pe1_y0_o;
+                                lvec_dataR_n[{2'd3,2'd2}] = vec_pe1_x1_o;
+                                lvec_dataI_n[{2'd3,2'd2}] = vec_pe1_y1_o;               
+                                vec_pe0_x0_i = vec_pe0_x1_o;
+                                vec_pe0_y0_i = vec_pe0_y1_o;
+                                vec_pe0_x1_i = lvec_dataR[{2'd2,2'd3}];
+                                vec_pe0_y1_i = lvec_dataI[{2'd2,2'd3}];
+                                vec_pe1_x0_i = vec_pe1_x1_o;
+                                vec_pe1_y0_i = vec_pe1_y1_o;
+                                vec_pe1_x1_i = lvec_dataR[{2'd3,2'd3}];
+                                vec_pe1_y1_i = lvec_dataI[{2'd3,2'd3}];
+                            end
+                            5'd16: begin
+                            	inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                vec_pe0_x0_i = rvec_dataR[{2'd0,2'd0}];
+                                vec_pe0_y0_i = rvec_dataI[{2'd0,2'd0}];
+                                vec_pe0_x1_i = rvec_dataR[{2'd0,2'd1}];
+                                vec_pe0_y1_i = rvec_dataI[{2'd0,2'd1}];
+                                vec_pe1_x0_i = rvec_dataR[{2'd1,2'd0}];
+                                vec_pe1_y0_i = rvec_dataI[{2'd1,2'd0}];
+                                vec_pe1_x1_i = rvec_dataR[{2'd1,2'd1}];
+                                vec_pe1_y1_i = rvec_dataI[{2'd1,2'd1}];
+                            end
+                            5'd17: begin
+                                inv_i = 0;
+                                vec_pe0_valid = 2'b11;
+                                vec_pe1_valid = 2'b11;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                vec_pe0_x0_i = rvec_dataR[{2'd2,2'd0}];
+                                vec_pe0_y0_i = rvec_dataI[{2'd2,2'd0}];
+                                vec_pe0_x1_i = rvec_dataR[{2'd2,2'd1}];
+                                vec_pe0_y1_i = rvec_dataI[{2'd2,2'd1}];
+                                vec_pe1_x0_i = rvec_dataR[{2'd3,2'd0}];
+                                vec_pe1_y0_i = rvec_dataI[{2'd3,2'd0}];
+                                vec_pe1_x1_i = rvec_dataR[{2'd3,2'd1}];
+                                vec_pe1_y1_i = rvec_dataI[{2'd3,2'd1}];
+                            end
+                            5'd18: begin
+                                vec_pe0_valid = 2'b00;
+                                vec_pe1_valid = 2'b00;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                lvec_dataR_n[{2'd0,2'd2}] = vec_pe0_x0_o;
+                                lvec_dataI_n[{2'd0,2'd2}] = vec_pe0_y0_o;
+                                lvec_dataR_n[{2'd0,2'd3}] = vec_pe0_x1_o;
+                                lvec_dataI_n[{2'd0,2'd3}] = vec_pe0_y1_o;
+                                lvec_dataR_n[{2'd1,2'd2}] = vec_pe1_x0_o;
+                                lvec_dataI_n[{2'd1,2'd2}] = vec_pe1_y0_o;
+                                lvec_dataR_n[{2'd1,2'd3}] = vec_pe1_x1_o;
+                                lvec_dataI_n[{2'd1,2'd3}] = vec_pe1_y1_o;
+                            end
+                            5'd19: begin
+                            	vec_pe0_valid = 2'b00;
+                                vec_pe1_valid = 2'b00;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                                lvec_dataR_n[{2'd2,2'd2}] = vec_pe0_x0_o;
+                                lvec_dataI_n[{2'd2,2'd2}] = vec_pe0_y0_o;
+                                lvec_dataR_n[{2'd2,2'd3}] = vec_pe0_x1_o;
+                                lvec_dataI_n[{2'd2,2'd3}] = vec_pe0_y1_o;
+                                lvec_dataR_n[{2'd3,2'd2}] = vec_pe1_x0_o;
+                                lvec_dataI_n[{2'd3,2'd2}] = vec_pe1_y0_o;
+                                lvec_dataR_n[{2'd3,2'd3}] = vec_pe1_x1_o;
+                                lvec_dataI_n[{2'd3,2'd3}] = vec_pe1_y1_o;
+                            end
+
+                            default: begin
+                                inv_i = 0;
+                                vec_pe0_valid = 2'b00;
+                                vec_pe1_valid = 2'b00;
+                                vec_pe0_scheme = RELATED_ROTATE;
+                                vec_pe1_scheme = RELATED_ROTATE;
+                            end
+                        endcase
+                    end
+                endcase
             end
             SEND: begin
                 for(i = 0; i < CHANNEL_SIZE; i = i + 1) begin
