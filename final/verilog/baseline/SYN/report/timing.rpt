@@ -1,0 +1,130 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : TOP
+Version: N-2017.09-SP2
+Date   : Sat Jun 22 22:23:56 2019
+****************************************
+
+Operating Conditions: slow   Library: slow
+Wire Load Model Mode: top
+
+  Startpoint: PEs/vec_unit/PE0/CORDIC1/X_reg_reg[1][0]
+              (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: PEs/vec_unit/PE0/CORDIC1/X_reg_reg[2][18]
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  TOP                tsmc13_wl10           slow
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clk (rise edge)                                   0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  PEs/vec_unit/PE0/CORDIC1/X_reg_reg[1][0]/CK (DFFRX4)
+                                                          0.00       0.50 r
+  PEs/vec_unit/PE0/CORDIC1/X_reg_reg[1][0]/Q (DFFRX4)     0.30       0.80 f
+  PEs/vec_unit/PE0/CORDIC1/U1932/Y (OR2X2)                0.17       0.97 f
+  PEs/vec_unit/PE0/CORDIC1/U1992/CO (ADDFHX4)             0.15       1.11 f
+  PEs/vec_unit/PE0/CORDIC1/U1933/Y (OAI21X2)              0.07       1.19 r
+  PEs/vec_unit/PE0/CORDIC1/U1934/Y (OAI2BB1X2)            0.07       1.26 f
+  PEs/vec_unit/PE0/CORDIC1/U1982/CO (ADDFHX4)             0.14       1.39 f
+  PEs/vec_unit/PE0/CORDIC1/U1977/CO (ADDFHX4)             0.13       1.52 f
+  PEs/vec_unit/PE0/CORDIC1/U1972/CO (ADDFHX4)             0.13       1.65 f
+  PEs/vec_unit/PE0/CORDIC1/U1968/CO (ADDFHX4)             0.13       1.78 f
+  PEs/vec_unit/PE0/CORDIC1/U1965/CO (ADDFHX4)             0.15       1.92 f
+  PEs/vec_unit/PE0/CORDIC1/U1935/Y (AOI22X4)              0.12       2.05 r
+  PEs/vec_unit/PE0/CORDIC1/U1937/Y (OAI22X4)              0.08       2.12 f
+  PEs/vec_unit/PE0/CORDIC1/U1955/CO (ADDFHX4)             0.14       2.26 f
+  PEs/vec_unit/PE0/CORDIC1/U1045/CO (ADDFHX2)             0.14       2.40 f
+  PEs/vec_unit/PE0/CORDIC1/U1041/CO (ADDFX2)              0.23       2.63 f
+  PEs/vec_unit/PE0/CORDIC1/U1948/CO (ADDFHX4)             0.14       2.77 f
+  PEs/vec_unit/PE0/CORDIC1/U1945/CO (ADDFHX4)             0.13       2.90 f
+  PEs/vec_unit/PE0/CORDIC1/U1943/CO (ADDFHX4)             0.13       3.03 f
+  PEs/vec_unit/PE0/CORDIC1/U2005/CO (ADDFHX4)             0.13       3.15 f
+  PEs/vec_unit/PE0/CORDIC1/U2042/CO (ADDFHX4)             0.12       3.28 f
+  PEs/vec_unit/PE0/CORDIC1/U956/Y (XNOR2X2)               0.09       3.37 r
+  PEs/vec_unit/PE0/CORDIC1/U955/Y (NAND2X2)               0.09       3.45 f
+  PEs/vec_unit/PE0/CORDIC1/U2043/Y (OAI21X4)              0.08       3.54 r
+  PEs/vec_unit/PE0/CORDIC1/U2046/Y (XNOR2X4)              0.30       3.84 f
+  PEs/vec_unit/PE0/CORDIC1/U1396/Y (NAND2X2)              0.17       4.01 r
+  PEs/vec_unit/PE0/CORDIC1/U1395/Y (OAI21X4)              0.07       4.09 f
+  PEs/vec_unit/PE0/CORDIC1/U971/Y (OAI2BB1X4)             0.11       4.20 f
+  PEs/vec_unit/PE0/CORDIC1/U2065/Y (OAI2BB1X4)            0.11       4.31 f
+  PEs/vec_unit/PE0/CORDIC1/U2067/CO (ADDFHX4)             0.13       4.44 f
+  PEs/vec_unit/PE0/CORDIC1/U2072/CO (ADDFHX4)             0.12       4.57 f
+  PEs/vec_unit/PE0/CORDIC1/U2078/CO (ADDFHX2)             0.14       4.71 f
+  PEs/vec_unit/PE0/CORDIC1/U2099/CO (ADDFHX2)             0.15       4.85 f
+  PEs/vec_unit/PE0/CORDIC1/U2097/CO (ADDFHX2)             0.15       5.01 f
+  PEs/vec_unit/PE0/CORDIC1/U2095/CO (ADDFHX4)             0.13       5.14 f
+  PEs/vec_unit/PE0/CORDIC1/U993/CO (ADDFHX2)              0.15       5.28 f
+  PEs/vec_unit/PE0/CORDIC1/U1326/Y (XOR2X4)               0.09       5.38 r
+  PEs/vec_unit/PE0/CORDIC1/U1325/Y (XOR2X4)               0.13       5.51 f
+  PEs/vec_unit/PE0/CORDIC1/U1401/Y (BUFX20)               0.13       5.64 f
+  PEs/vec_unit/PE0/CORDIC1/U1258/Y (NAND2X1)              0.19       5.83 r
+  PEs/vec_unit/PE0/CORDIC1/U995/Y (NAND2X2)               0.12       5.94 f
+  PEs/vec_unit/PE0/CORDIC1/U994/Y (NOR2X4)                0.12       6.06 r
+  PEs/vec_unit/PE0/CORDIC1/U1406/Y (NAND2X2)              0.09       6.16 f
+  PEs/vec_unit/PE0/CORDIC1/U973/Y (NOR2X8)                0.07       6.23 r
+  PEs/vec_unit/PE0/CORDIC1/U972/CO (AFHCINX4)             0.06       6.29 f
+  PEs/vec_unit/PE0/CORDIC1/U2154/CO (ADDFHX2)             0.17       6.46 f
+  PEs/vec_unit/PE0/CORDIC1/U999/CO (ADDFHX4)              0.13       6.60 f
+  PEs/vec_unit/PE0/CORDIC1/U2144/CO (ADDFHX4)             0.13       6.72 f
+  PEs/vec_unit/PE0/CORDIC1/U1417/Y (XNOR2X4)              0.09       6.81 r
+  PEs/vec_unit/PE0/CORDIC1/U1328/Y (XOR2X4)               0.17       6.98 f
+  PEs/vec_unit/PE0/CORDIC1/U2140/Y (INVX12)               0.07       7.05 r
+  PEs/vec_unit/PE0/CORDIC1/U2141/Y (INVX20)               0.06       7.11 f
+  PEs/vec_unit/PE0/CORDIC1/U240/Y (NOR2X2)                0.16       7.26 r
+  PEs/vec_unit/PE0/CORDIC1/U2189/Y (NOR2X4)               0.08       7.35 f
+  PEs/vec_unit/PE0/CORDIC1/U2193/Y (NAND2X2)              0.10       7.45 r
+  PEs/vec_unit/PE0/CORDIC1/U1060/Y (NOR2X2)               0.06       7.51 f
+  PEs/vec_unit/PE0/CORDIC1/U1409/Y (OAI2BB1X4)            0.13       7.63 f
+  PEs/vec_unit/PE0/CORDIC1/U998/Y (NOR2X4)                0.09       7.72 r
+  PEs/vec_unit/PE0/CORDIC1/U2250/CO (AFHCINX4)            0.08       7.80 f
+  PEs/vec_unit/PE0/CORDIC1/U2249/CON (AFHCONX4)           0.12       7.93 r
+  PEs/vec_unit/PE0/CORDIC1/U2289/CO (AFHCINX4)            0.11       8.04 f
+  PEs/vec_unit/PE0/CORDIC1/U2291/CON (AFHCONX4)           0.12       8.16 r
+  PEs/vec_unit/PE0/CORDIC1/U2292/CO (AFHCINX4)            0.11       8.27 f
+  PEs/vec_unit/PE0/CORDIC1/U2294/CON (AFHCONX4)           0.12       8.39 r
+  PEs/vec_unit/PE0/CORDIC1/U2296/CO (AFHCINX4)            0.10       8.49 f
+  PEs/vec_unit/PE0/CORDIC1/U2297/Y (XNOR2X4)              0.11       8.60 r
+  PEs/vec_unit/PE0/CORDIC1/U1321/Y (XOR2X4)               0.16       8.76 f
+  PEs/vec_unit/PE0/CORDIC1/U2300/Y (INVX20)               0.13       8.89 r
+  PEs/vec_unit/PE0/CORDIC1/U2329/Y (NOR2X4)               0.08       8.97 f
+  PEs/vec_unit/PE0/CORDIC1/U2334/Y (NOR2X4)               0.13       9.10 r
+  PEs/vec_unit/PE0/CORDIC1/U953/Y (NAND2X2)               0.07       9.17 f
+  PEs/vec_unit/PE0/CORDIC1/U1392/Y (OAI21X4)              0.13       9.30 r
+  PEs/vec_unit/PE0/CORDIC1/U1391/Y (AOI21X4)              0.08       9.38 f
+  PEs/vec_unit/PE0/CORDIC1/U2360/CO (AFHCINX4)            0.10       9.48 r
+  PEs/vec_unit/PE0/CORDIC1/U2341/CON (AFHCONX4)           0.11       9.59 f
+  PEs/vec_unit/PE0/CORDIC1/U2359/CO (AFHCINX4)            0.12       9.71 r
+  PEs/vec_unit/PE0/CORDIC1/U2342/CON (AFHCONX4)           0.11       9.82 f
+  PEs/vec_unit/PE0/CORDIC1/U2358/CO (AFHCINX4)            0.12       9.94 r
+  PEs/vec_unit/PE0/CORDIC1/U2343/CON (AFHCONX4)           0.10      10.04 f
+  PEs/vec_unit/PE0/CORDIC1/U6/CO (AFHCINX2)               0.13      10.17 r
+  PEs/vec_unit/PE0/CORDIC1/U3/Y (XNOR2X2)                 0.12      10.29 r
+  PEs/vec_unit/PE0/CORDIC1/X_reg_reg[2][18]/D (DFFRX2)
+                                                          0.00      10.29 r
+  data arrival time                                                 10.29
+
+  clock clk (rise edge)                                  10.00      10.00
+  clock network delay (ideal)                             0.50      10.50
+  clock uncertainty                                      -0.10      10.40
+  PEs/vec_unit/PE0/CORDIC1/X_reg_reg[2][18]/CK (DFFRX2)
+                                                          0.00      10.40 r
+  library setup time                                     -0.11      10.29
+  data required time                                                10.29
+  --------------------------------------------------------------------------
+  data required time                                                10.29
+  data arrival time                                                -10.29
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1

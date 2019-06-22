@@ -1,0 +1,1 @@
+testbench.v netlist/SVD_syn.v -v tsmc13.v +define+SDF
