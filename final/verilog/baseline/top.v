@@ -64,6 +64,7 @@ module TOP(
     reg [$clog2(CHANNEL_SIZE)-1:0] cnt, cnt_n;
     reg [$clog2(MAXSWEEP)-1:0] sw_num, sw_num_n;
     reg [1:0] valid_o_n;
+    reg neg_val;
     wire diag_end;
 
     
@@ -77,7 +78,7 @@ module TOP(
     localparam BIDIAG  = 3'd2;
     localparam DIAG    = 3'd3;
     localparam SEND    = 3'd4;
-    localparam DONE    = 3'd5;
+    //localparam DONE    = 3'd5;
 
     integer i;
     
@@ -123,8 +124,8 @@ module TOP(
             RECIEVE: STATE_N = ~valid_i ? BIDIAG : RECIEVE;
             BIDIAG:  STATE_N = (PHASE == BIDEND) ? DIAG : BIDIAG;
             DIAG:    STATE_N = (diag_end) ? SEND:DIAG;
-            SEND:    STATE_N = (cnt == CHANNEL_SIZE) ? DONE : SEND;
-            DONE:    STATE_N = DONE;
+            SEND:    STATE_N = (cnt == CHANNEL_SIZE-1 && valid_o == 2'b11) ? IDLE : SEND;
+            //DONE:    STATE_N = DONE;
             default: STATE_N = STATE;
         endcase
     end
@@ -141,6 +142,7 @@ module TOP(
         I_o = 0;
         cnt_n = cnt;
         valid_o_n = valid_o;
+        neg_val = 0;
         pe0_valid = 2'b00;
         pe1_valid = 2'b00;
         pe0_scheme = 0;
@@ -1286,35 +1288,89 @@ module TOP(
                 cnt_n = cnt + 1;
                 case (valid_o)
                     2'b01: begin
-                        R_o = dataR[cnt];
-                        I_o = dataI[cnt];
+                        case (cnt[1:0])
+                            2'b00: begin
+                                if(dataR[0][BIT_NUM-1]) begin
+                                    R_o = -dataR[0];
+                                    I_o = 0;
+                                    neg_val = 1;
+                                end
+                                else begin
+                                    R_o = dataR[0];
+                                    I_o = 0;
+                                    neg_val = 0;
+                                end
+                            end
+                            2'b01: begin
+                                if(dataR[5][BIT_NUM-1]) begin
+                                    R_o = -dataR[5];
+                                    I_o = 0;
+                                    neg_val = 1;
+                                end
+                                else begin
+                                    R_o = dataR[5];
+                                    I_o = 0;
+                                    neg_val = 0;
+                                end
+                            end
+                            2'b10: begin
+                                if(dataR[10][BIT_NUM-1]) begin
+                                    R_o = -dataR[10];
+                                    I_o = 0;
+                                    neg_val = 1;
+                                end
+                                else begin
+                                    R_o = dataR[10];
+                                    I_o = 0;
+                                    neg_val = 0;
+                                end
+                            end
+                            2'b11: begin
+                                if(dataR[15][BIT_NUM-1]) begin
+                                    R_o = -dataR[15];
+                                    I_o = 0;
+                                    neg_val = 1;
+                                end
+                                else begin
+                                    R_o = dataR[15];
+                                    I_o = 0;
+                                    neg_val = 0;
+                                end
+                            end  
+                        endcase
                     end
 
                     2'b10: begin
                         R_o = lvec_dataR[cnt];
                         I_o = lvec_dataI[cnt];
+                        neg_val = 0;
                     end
 
                     2'b11: begin
                         R_o = rvec_dataR[cnt];
                         I_o = rvec_dataI[cnt];
+                        neg_val = 0;
                     end
                     default : begin
                         R_o = 0;
                         I_o = 0;
+                        neg_val = 0;
                     end
                 endcase
-                if(cnt == 4'd15) begin
+                if(cnt == 4'd15 || (cnt == 4'd3 && valid_o ==2'b01)) begin
                     valid_o_n = valid_o + 1;
+                    cnt_n = 0;
                 end
                 else begin
                     valid_o_n = valid_o;
                 end
                 //valid_o_n = (valid_o == 2'b11 && cnt == 4'd15) ? 0 : 1;
             end
+            /*
             DONE: begin
                 valid_o_n = 0;
             end
+            */
         endcase
     end
 
@@ -2514,7 +2570,7 @@ module TOP(
                                 vec_pe1_y1_i = rvec_dataI[{2'd1,2'd3}];
                             end
                             5'd5: begin
-                            	inv_i = 0;
+                                inv_i = 0;
                                 vec_pe0_valid = 2'b11;
                                 vec_pe1_valid = 2'b11;
                                 vec_pe0_scheme = RELATED_ROTATE;
@@ -2538,7 +2594,7 @@ module TOP(
                                 vec_pe1_y1_i = rvec_dataI[{2'd3,2'd3}];
                             end
                             5'd6: begin
-                            	inv_i = 0;
+                                inv_i = 0;
                                 vec_pe0_valid = 2'b11;
                                 vec_pe1_valid = 2'b11;
                                 vec_pe0_scheme = RELATED_ROTATE;
@@ -2553,7 +2609,7 @@ module TOP(
                                 vec_pe1_y1_i = lvec_dataI[{2'd1,2'd1}];
                             end
                             5'd7: begin
-                            	inv_i = 0;
+                                inv_i = 0;
                                 vec_pe0_valid = 2'b11;
                                 vec_pe1_valid = 2'b11;
                                 vec_pe0_scheme = RELATED_ROTATE;
@@ -2582,7 +2638,7 @@ module TOP(
                                 rvec_dataI_n[{2'd1,2'd3}] = vec_pe1_y1_o;
                             end
                             5'd9: begin
-                            	vec_pe0_valid = 2'b00;
+                                vec_pe0_valid = 2'b00;
                                 vec_pe1_valid = 2'b00;
                                 vec_pe0_scheme = RELATED_ROTATE;
                                 vec_pe1_scheme = RELATED_ROTATE;
@@ -2596,7 +2652,7 @@ module TOP(
                                 rvec_dataI_n[{2'd3,2'd3}] = vec_pe1_y1_o;
                             end
                             5'd10: begin
-                            	inv_i = 0;
+                                inv_i = 0;
                                 vec_pe0_valid = 2'b11;
                                 vec_pe1_valid = 2'b11;
                                 vec_pe0_scheme = RELATED_ROTATE;
@@ -2619,7 +2675,7 @@ module TOP(
                                 vec_pe1_y1_i = lvec_dataI[{2'd1,2'd2}];
                             end
                             5'd11: begin
-                            	inv_i = 0;
+                                inv_i = 0;
                                 vec_pe0_valid = 2'b11;
                                 vec_pe1_valid = 2'b11;
                                 vec_pe0_scheme = RELATED_ROTATE;
@@ -2666,7 +2722,7 @@ module TOP(
                                 vec_pe1_y1_i = lvec_dataI[{2'd1,2'd3}];
                             end
                             5'd15: begin
-                            	inv_i = 0;
+                                inv_i = 0;
                                 vec_pe0_valid = 2'b11;
                                 vec_pe1_valid = 2'b11;
                                 vec_pe0_scheme = RELATED_ROTATE;
@@ -2689,7 +2745,7 @@ module TOP(
                                 vec_pe1_y1_i = lvec_dataI[{2'd3,2'd3}];
                             end
                             5'd16: begin
-                            	inv_i = 0;
+                                inv_i = 0;
                                 vec_pe0_valid = 2'b11;
                                 vec_pe1_valid = 2'b11;
                                 vec_pe0_scheme = RELATED_ROTATE;
@@ -2733,7 +2789,7 @@ module TOP(
                                 lvec_dataI_n[{2'd1,2'd3}] = vec_pe1_y1_o;
                             end
                             5'd19: begin
-                            	vec_pe0_valid = 2'b00;
+                                vec_pe0_valid = 2'b00;
                                 vec_pe1_valid = 2'b00;
                                 vec_pe0_scheme = RELATED_ROTATE;
                                 vec_pe1_scheme = RELATED_ROTATE;
@@ -2760,12 +2816,66 @@ module TOP(
             end
             SEND: begin
                 for(i = 0; i < CHANNEL_SIZE; i = i + 1) begin
-                    lvec_dataR_n[i] = lvec_dataR[i];
-                    lvec_dataI_n[i] = lvec_dataI[i];
+
                     rvec_dataR_n[i] = rvec_dataR[i];
                     rvec_dataI_n[i] = rvec_dataI[i];
-                end 
+                end
+                if (neg_val) begin
+                    for(i = 0; i < CHANNEL_SIZE; i = i + 1) begin
+                        lvec_dataR_n[i] = lvec_dataR[i];
+                        lvec_dataI_n[i] = lvec_dataI[i];
+                    end
+                    case (cnt[1:0])  
+                        2'b00: begin
+                            lvec_dataR_n[{2'b00, 2'b00}] = -lvec_dataR[{2'b00, 2'b00}];
+                            lvec_dataI_n[{2'b00, 2'b00}] = -lvec_dataI[{2'b00, 2'b00}];
+                            lvec_dataR_n[{2'b01, 2'b00}] = -lvec_dataR[{2'b01, 2'b00}];
+                            lvec_dataI_n[{2'b01, 2'b00}] = -lvec_dataI[{2'b01, 2'b00}];
+                            lvec_dataR_n[{2'b10, 2'b00}] = -lvec_dataR[{2'b10, 2'b00}];
+                            lvec_dataI_n[{2'b10, 2'b00}] = -lvec_dataI[{2'b10, 2'b00}];
+                            lvec_dataR_n[{2'b11, 2'b00}] = -lvec_dataR[{2'b11, 2'b00}];
+                            lvec_dataI_n[{2'b11, 2'b00}] = -lvec_dataI[{2'b11, 2'b00}];
+                        end
+                        2'b01: begin
+                            lvec_dataR_n[{2'b00, 2'b01}] = -lvec_dataR[{2'b00, 2'b01}];
+                            lvec_dataI_n[{2'b00, 2'b01}] = -lvec_dataI[{2'b00, 2'b01}];
+                            lvec_dataR_n[{2'b01, 2'b01}] = -lvec_dataR[{2'b01, 2'b01}];
+                            lvec_dataI_n[{2'b01, 2'b01}] = -lvec_dataI[{2'b01, 2'b01}];
+                            lvec_dataR_n[{2'b10, 2'b01}] = -lvec_dataR[{2'b10, 2'b01}];
+                            lvec_dataI_n[{2'b10, 2'b01}] = -lvec_dataI[{2'b10, 2'b01}];
+                            lvec_dataR_n[{2'b11, 2'b01}] = -lvec_dataR[{2'b11, 2'b01}];
+                            lvec_dataI_n[{2'b11, 2'b01}] = -lvec_dataI[{2'b11, 2'b01}];
+                        end
+                        2'b10: begin
+                            lvec_dataR_n[{2'b00, 2'b10}] = -lvec_dataR[{2'b00, 2'b10}];
+                            lvec_dataI_n[{2'b00, 2'b10}] = -lvec_dataI[{2'b00, 2'b10}];
+                            lvec_dataR_n[{2'b01, 2'b10}] = -lvec_dataR[{2'b01, 2'b10}];
+                            lvec_dataI_n[{2'b01, 2'b10}] = -lvec_dataI[{2'b01, 2'b10}];
+                            lvec_dataR_n[{2'b10, 2'b10}] = -lvec_dataR[{2'b10, 2'b10}];
+                            lvec_dataI_n[{2'b10, 2'b10}] = -lvec_dataI[{2'b10, 2'b10}];
+                            lvec_dataR_n[{2'b11, 2'b10}] = -lvec_dataR[{2'b11, 2'b10}];
+                            lvec_dataI_n[{2'b11, 2'b10}] = -lvec_dataI[{2'b11, 2'b10}];
+                        end
+                        2'b11: begin
+                            lvec_dataR_n[{2'b00, 2'b11}] = -lvec_dataR[{2'b00, 2'b11}];
+                            lvec_dataI_n[{2'b00, 2'b11}] = -lvec_dataI[{2'b00, 2'b11}];
+                            lvec_dataR_n[{2'b01, 2'b11}] = -lvec_dataR[{2'b01, 2'b11}];
+                            lvec_dataI_n[{2'b01, 2'b11}] = -lvec_dataI[{2'b01, 2'b11}];
+                            lvec_dataR_n[{2'b10, 2'b11}] = -lvec_dataR[{2'b10, 2'b11}];
+                            lvec_dataI_n[{2'b10, 2'b11}] = -lvec_dataI[{2'b10, 2'b11}];
+                            lvec_dataR_n[{2'b11, 2'b11}] = -lvec_dataR[{2'b11, 2'b11}];
+                            lvec_dataI_n[{2'b11, 2'b11}] = -lvec_dataI[{2'b11, 2'b11}];
+                        end  
+                    endcase
+                end
+                else begin
+                    for(i = 0; i < CHANNEL_SIZE; i = i + 1) begin
+                        lvec_dataR_n[i] = lvec_dataR[i];
+                        lvec_dataI_n[i] = lvec_dataI[i];
+                    end
+                end
             end
+            /*
             DONE: begin
                 for(i = 0; i < CHANNEL_SIZE; i = i + 1) begin
                     lvec_dataR_n[i] = lvec_dataR[i];
@@ -2774,6 +2884,7 @@ module TOP(
                     rvec_dataI_n[i] = rvec_dataI[i];
                 end 
             end
+            */
         endcase
     end
     
