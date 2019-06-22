@@ -12,6 +12,9 @@ nWaveLog
 command.log
 *.svf
 *.X
+.synopsys_dc.setup
+tsmc13.v
+tsmc13_neg.v
 
 #ncverilog
 ncverilog.*

@@ -1,25 +1,25 @@
 `timescale 1ns/10ps
 `define CYCLE 10.0
 `ifdef A
-	`define REAL_PAT "./dat/4x4/patternR_a.dat"
-	`define IMAG_PAT "./dat/4x4/patternI_a.dat"
-	`define REAL_GOLD "./dat/4x4/goldenR_a.dat"
-	`define IMAG_GOLD "./dat/4x4/goldenI_a.dat"
+	`define REAL_PAT "../dat/4x4/patternR_a.dat"
+	`define IMAG_PAT "../dat/4x4/patternI_a.dat"
+	`define REAL_GOLD "../dat/4x4/goldenR_a.dat"
+	`define IMAG_GOLD "../dat/4x4/goldenI_a.dat"
 `elsif B
-	`define REAL_PAT "./dat/4x4/patternR_b.dat"
-	`define IMAG_PAT "./dat/4x4/patternI_b.dat"
-	`define REAL_GOLD "./dat/4x4/goldenR_b.dat"
-	`define IMAG_GOLD "./dat/4x4/goldenI_b.dat"
+	`define REAL_PAT "../dat/4x4/patternR_b.dat"
+	`define IMAG_PAT "../dat/4x4/patternI_b.dat"
+	`define REAL_GOLD "../dat/4x4/goldenR_b.dat"
+	`define IMAG_GOLD "../dat/4x4/goldenI_b.dat"
 `elsif C
-	`define REAL_PAT "./dat/4x4/patternR_c.dat"
-	`define IMAG_PAT "./dat/4x4/patternI_c.dat"
-	`define REAL_GOLD "./dat/4x4/goldenR_c.dat"
-	`define IMAG_GOLD "./dat/4x4/goldenI_c.dat"
+	`define REAL_PAT "../dat/4x4/patternR_c.dat"
+	`define IMAG_PAT "../dat/4x4/patternI_c.dat"
+	`define REAL_GOLD "../dat/4x4/goldenR_c.dat"
+	`define IMAG_GOLD "../dat/4x4/goldenI_c.dat"
 `elsif D
-	`define REAL_PAT "./dat/bidiag/patternR.dat"
-	`define IMAG_PAT "./dat/bidiag/patternI.dat"
-	`define REAL_GOLD "./dat/bidiag/goldenR.dat"
-	`define IMAG_GOLD "./dat/bidiag/goldenI.dat"
+	`define REAL_PAT "../dat/bidiag/patternR.dat"
+	`define IMAG_PAT "../dat/bidiag/patternI.dat"
+	`define REAL_GOLD "../dat/bidiag/goldenR.dat"
+	`define IMAG_GOLD "../dat/bidiag/goldenI.dat"
 `endif
 
 module x4_test;

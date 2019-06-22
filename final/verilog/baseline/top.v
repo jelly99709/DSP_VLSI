@@ -1,3 +1,7 @@
+`include "PE_cluster.v"
+`include "PE_VR.v"
+`include "PE_R.v"
+
 module TOP(
     clk,   
     rst_n,
@@ -2427,10 +2431,10 @@ module TOP(
                 endcase
             end
             DIAG: begin
-                valid_o_n = (diag_end) ? 1 : 0;
+                //valid_o_n = (diag_end) ? 1 : 0;
                 case (DPHASE)
                     1'b0: begin
-                        sw_num_n = sw_num;
+                        //sw_num_n = sw_num;
                         case(cnt[1:0])
 
                             2'b00: begin
@@ -2447,8 +2451,8 @@ module TOP(
                                 vec_pe1_y0_i = rvec_dataI[{2'd1,2'd0}];
                                 vec_pe1_x1_i = rvec_dataR[{2'd1,2'd1}];
                                 vec_pe1_y1_i = rvec_dataI[{2'd1,2'd1}];
-                                DPHASE_N = 0;
-                                cnt_n = cnt + 1;
+                                //DPHASE_N = 0;
+                                //cnt_n = cnt + 1;
                             end
                             2'b01: begin
                                 inv_i = 0;
@@ -2464,31 +2468,32 @@ module TOP(
                                 vec_pe1_y0_i = rvec_dataI[{2'd3,2'd0}];
                                 vec_pe1_x1_i = rvec_dataR[{2'd3,2'd1}];
                                 vec_pe1_y1_i = rvec_dataI[{2'd3,2'd1}];
-                                DPHASE_N = 0;
-                                cnt_n = cnt + 1;
+                                //DPHASE_N = 0;
+                                //cnt_n = cnt + 1;
                             end
                             2'b10: begin
                                 vec_pe0_valid = 2'b00;
                                 vec_pe1_valid = 2'b00;
                                 vec_pe0_scheme = RELATED_ROTATE;
                                 vec_pe1_scheme = RELATED_ROTATE;
-                                DPHASE_N = 0;
-                                cnt_n = cnt + 1;
+                                //DPHASE_N = 0;
+                                //cnt_n = cnt + 1;
                             end
                             2'b11: begin
                                 vec_pe0_valid = 2'b00;
                                 vec_pe1_valid = 2'b00;
                                 vec_pe0_scheme = RELATED_ROTATE;
                                 vec_pe1_scheme = RELATED_ROTATE;
-                                DPHASE_N = 1;
-                                cnt_n = 0;
+                                //DPHASE_N = 1;
+                                //cnt_n = 0;
                             end
                         endcase
 
                     end
                     1'b1: begin
-                        DPHASE_N = 1;
-                        cnt_n = 0;
+                        //DPHASE_N = 1;
+                        //cnt_n = 0;
+                        /*
                         if(DIAG_STATE == 5'd19) begin
                             DIAG_STATE_N = 5'd0;
                             sw_num_n = sw_num + 1;
@@ -2497,7 +2502,7 @@ module TOP(
                             DIAG_STATE_N = DIAG_STATE + 1;
                             sw_num_n = sw_num;
                         end
-
+                        */
                         case (DIAG_STATE[4:0])
                             5'd0: begin
                                 inv_i = 0;
