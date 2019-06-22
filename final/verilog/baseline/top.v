@@ -1,5 +1,3 @@
-//`include "./PEs.v"
-
 module TOP(
     clk,   
     rst_n,
@@ -40,11 +38,10 @@ module TOP(
     reg [1:0] inv;
     reg inv_i;
     wire [1:0] inv_n;
-    wire [ROTATION_NUM-1:0] angle0_i, angle1_i;
-    wire [ROTATION_NUM-1:0] angle0_o, angle1_o;
+    wire [ROTATION_NUM-1:0] angle_inv;
+
     assign inv_n = {inv[0], inv_i};
-    assign angle0_i = {angle0_o[13:9] ^ {5{inv[1]}}, angle0_o[8:4] ^ {5{inv[0]}}, angle0_o[3:0] ^ {4{inv_i}}};
-    assign angle1_i = {angle1_o[13:9] ^ {5{inv[1]}}, angle1_o[8:4] ^ {5{inv[0]}}, angle1_o[3:0] ^ {4{inv_i}}};
+    assign angle_inv = {{5{inv[1]}}, {5{inv[0]}}, {4{inv_i}}};
 
     localparam COMPLEX_2_REAL = 2'd0;
     localparam COMPLEX_ROTATE = 2'd1;
@@ -87,42 +84,34 @@ module TOP(
     localparam BIDEND = 7'd67;
     assign diag_end = (sw_num == MAXSWEEP-1) && (DIAG_STATE == 5'd15);
 
-    PEs unit(
+    PE_cluster PEs(
         .clk(clk),
         .rst_n(rst_n),
-        .PE0_valid_i(pe0_valid),
-        .PE1_valid_i(pe1_valid),
-        .PE0_scheme_i(pe0_scheme),
-        .PE1_scheme_i(pe1_scheme),
-        .PE0_X0_i(pe0_x0_i), .PE0_Y0_i(pe0_y0_i),
-        .PE0_X1_i(pe0_x1_i), .PE0_Y1_i(pe0_y1_i),
-        .PE1_X0_i(pe1_x0_i), .PE1_Y0_i(pe1_y0_i),
-        .PE1_X1_i(pe1_x1_i), .PE1_Y1_i(pe1_y1_i),
-        .PE0_X0_o(pe0_x0_o), .PE0_Y0_o(pe0_y0_o),
-        .PE0_X1_o(pe0_x1_o), .PE0_Y1_o(pe0_y1_o),
-        .PE1_X0_o(pe1_x0_o), .PE1_Y0_o(pe1_y0_o),
-        .PE1_X1_o(pe1_x1_o), .PE1_Y1_o(pe1_y1_o), 
-        .angle0_o(angle0_o), 
-        .angle1_o(angle1_o)
-        );
-
-    vecPEs vec_unit(
-        .clk(clk),
-        .rst_n(rst_n),
-        .PE0_valid_i(vec_pe0_valid),
-        .PE1_valid_i(vec_pe1_valid),
-        .PE0_scheme_i(vec_pe0_scheme),
-        .PE1_scheme_i(vec_pe1_scheme),
-        .PE0_X0_i(vec_pe0_x0_i), .PE0_Y0_i(vec_pe0_y0_i),
-        .PE0_X1_i(vec_pe0_x1_i), .PE0_Y1_i(vec_pe0_y1_i),
-        .PE1_X0_i(vec_pe1_x0_i), .PE1_Y0_i(vec_pe1_y0_i),
-        .PE1_X1_i(vec_pe1_x1_i), .PE1_Y1_i(vec_pe1_y1_i),
-        .PE0_X0_o(vec_pe0_x0_o), .PE0_Y0_o(vec_pe0_y0_o),
-        .PE0_X1_o(vec_pe0_x1_o), .PE0_Y1_o(vec_pe0_y1_o),
-        .PE1_X0_o(vec_pe1_x0_o), .PE1_Y0_o(vec_pe1_y0_o),
-        .PE1_X1_o(vec_pe1_x1_o), .PE1_Y1_o(vec_pe1_y1_o), 
-        .angle0_i(angle0_i), 
-        .angle1_i(angle1_i)
+        .val_PE0_valid_i(pe0_valid),
+        .val_PE1_valid_i(pe1_valid),
+        .val_PE0_scheme_i(pe0_scheme),
+        .val_PE1_scheme_i(pe1_scheme),
+        .val_PE0_X0_i(pe0_x0_i), .val_PE0_Y0_i(pe0_y0_i),
+        .val_PE0_X1_i(pe0_x1_i), .val_PE0_Y1_i(pe0_y1_i),
+        .val_PE1_X0_i(pe1_x0_i), .val_PE1_Y0_i(pe1_y0_i),
+        .val_PE1_X1_i(pe1_x1_i), .val_PE1_Y1_i(pe1_y1_i),
+        .val_PE0_X0_o(pe0_x0_o), .val_PE0_Y0_o(pe0_y0_o),
+        .val_PE0_X1_o(pe0_x1_o), .val_PE0_Y1_o(pe0_y1_o),
+        .val_PE1_X0_o(pe1_x0_o), .val_PE1_Y0_o(pe1_y0_o),
+        .val_PE1_X1_o(pe1_x1_o), .val_PE1_Y1_o(pe1_y1_o), 
+        .vec_PE0_valid_i(vec_pe0_valid),
+        .vec_PE1_valid_i(vec_pe1_valid),
+        .vec_PE0_scheme_i(vec_pe0_scheme),
+        .vec_PE1_scheme_i(vec_pe1_scheme),
+        .vec_PE0_X0_i(vec_pe0_x0_i), .vec_PE0_Y0_i(vec_pe0_y0_i),
+        .vec_PE0_X1_i(vec_pe0_x1_i), .vec_PE0_Y1_i(vec_pe0_y1_i),
+        .vec_PE1_X0_i(vec_pe1_x0_i), .vec_PE1_Y0_i(vec_pe1_y0_i),
+        .vec_PE1_X1_i(vec_pe1_x1_i), .vec_PE1_Y1_i(vec_pe1_y1_i),
+        .vec_PE0_X0_o(vec_pe0_x0_o), .vec_PE0_Y0_o(vec_pe0_y0_o),
+        .vec_PE0_X1_o(vec_pe0_x1_o), .vec_PE0_Y1_o(vec_pe0_y1_o),
+        .vec_PE1_X0_o(vec_pe1_x0_o), .vec_PE1_Y0_o(vec_pe1_y0_o),
+        .vec_PE1_X1_o(vec_pe1_x1_o), .vec_PE1_Y1_o(vec_pe1_y1_o), 
+        .angle_inv(angle_inv)
         );
 
     //state transfer
@@ -2863,3 +2852,4 @@ module TOP(
     end
 
 endmodule
+

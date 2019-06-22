@@ -1,190 +1,4 @@
-module vecPEs (
-    clk,   
-    rst_n,
-    PE0_valid_i,
-    PE1_valid_i,
-    PE0_scheme_i, 
-    PE1_scheme_i,
-
-    PE0_X0_i,
-    PE0_Y0_i,
-    PE0_X1_i,
-    PE0_Y1_i,
-    PE1_X0_i,
-    PE1_Y0_i,
-    PE1_X1_i,
-    PE1_Y1_i,
-
-    PE0_X0_o,
-    PE0_Y0_o,
-    PE0_X1_o,
-    PE0_Y1_o,
-    PE1_X0_o,
-    PE1_Y0_o,
-    PE1_X1_o,
-    PE1_Y1_o, 
-
-    angle0_i, 
-    angle1_i
-);
-
-    parameter BITWIDTH   = 18;
-    parameter CORDIC_NUM = 14;
-    localparam PIPE_NUM  = 4;
-
-    input clk;
-    input rst_n;
-    input [1:0] PE0_valid_i;
-    input [1:0] PE1_valid_i;
-    input [1:0] PE0_scheme_i; 
-    input [1:0] PE1_scheme_i;
-    input signed [BITWIDTH-1:0] PE0_X0_i;
-    input signed [BITWIDTH-1:0] PE0_Y0_i;
-    input signed [BITWIDTH-1:0] PE0_X1_i;
-    input signed [BITWIDTH-1:0] PE0_Y1_i;
-    input signed [BITWIDTH-1:0] PE1_X0_i;
-    input signed [BITWIDTH-1:0] PE1_Y0_i;
-    input signed [BITWIDTH-1:0] PE1_X1_i;
-    input signed [BITWIDTH-1:0] PE1_Y1_i;
-
-    output signed [BITWIDTH-1:0] PE0_X0_o;
-    output signed [BITWIDTH-1:0] PE0_Y0_o;
-    output signed [BITWIDTH-1:0] PE0_X1_o;
-    output signed [BITWIDTH-1:0] PE0_Y1_o;
-    output signed [BITWIDTH-1:0] PE1_X0_o;
-    output signed [BITWIDTH-1:0] PE1_Y0_o;
-    output signed [BITWIDTH-1:0] PE1_X1_o;
-    output signed [BITWIDTH-1:0] PE1_Y1_o;
-
-    input signed [CORDIC_NUM-1:0] angle0_i;
-    input signed [CORDIC_NUM-1:0] angle1_i;
-
-    wire [1:0] PE0_idle;
-    wire [1:0] PE0_scheme;
-    wire signed [BITWIDTH-1:0] PE0_X0_in;
-    wire signed [BITWIDTH-1:0] PE0_Y0_in;
-    wire signed [BITWIDTH-1:0] PE0_X1_in;
-    wire signed [BITWIDTH-1:0] PE0_Y1_in;
-    reg [CORDIC_NUM-1:0] PE0_angle_d0_in;
-    reg [CORDIC_NUM-1:0] PE0_angle_d1_in;
-
-    wire signed [BITWIDTH-1:0] PE0_X0_out;
-    wire signed [BITWIDTH-1:0] PE0_Y0_out;
-    wire signed [BITWIDTH-1:0] PE0_X1_out;
-    wire signed [BITWIDTH-1:0] PE0_Y1_out;
-    wire [CORDIC_NUM-1:0] PE0_angle_d0_out;
-    wire [CORDIC_NUM-1:0] PE0_angle_d1_out;
-    wire [PIPE_NUM-2:0] PE0_angle_val0_out;
-    wire [PIPE_NUM-2:0] PE0_angle_val1_out;
-
-    wire [1:0] PE1_idle;
-    wire [1:0] PE1_scheme;
-    wire signed [BITWIDTH-1:0] PE1_X0_in;
-    wire signed [BITWIDTH-1:0] PE1_Y0_in;
-    wire signed [BITWIDTH-1:0] PE1_X1_in;
-    wire signed [BITWIDTH-1:0] PE1_Y1_in;
-    reg [CORDIC_NUM-1:0] PE1_angle_d0_in;
-    reg [CORDIC_NUM-1:0] PE1_angle_d1_in;
-
-    wire signed [BITWIDTH-1:0] PE1_X0_out;
-    wire signed [BITWIDTH-1:0] PE1_Y0_out;
-    wire signed [BITWIDTH-1:0] PE1_X1_out;
-    wire signed [BITWIDTH-1:0] PE1_Y1_out;
-    wire [CORDIC_NUM-1:0] PE1_angle_d0_out;
-    wire [CORDIC_NUM-1:0] PE1_angle_d1_out;
-    wire [PIPE_NUM-2:0] PE1_angle_val0_out;
-    wire [PIPE_NUM-2:0] PE1_angle_val1_out;
-
-    integer i;
-
-    assign angle0_o = PE1_angle_d0_in;
-    assign angle1_o = PE0_angle_d1_in;
-
-    assign PE0_X0_o = PE0_X0_out;
-    assign PE0_Y0_o = PE0_Y0_out;
-    assign PE0_X1_o = PE0_X1_out;
-    assign PE0_Y1_o = PE0_Y1_out;
-
-    assign PE1_X0_o = PE1_X0_out;
-    assign PE1_Y0_o = PE1_Y0_out;
-    assign PE1_X1_o = PE1_X1_out;
-    assign PE1_Y1_o = PE1_Y1_out;
-    
-
-    assign PE0_idle   = ~PE0_valid_i;
-    assign PE0_scheme = PE0_scheme_i;
-    assign PE0_X0_in  = PE0_X0_i;
-    assign PE0_Y0_in  = PE0_Y0_i;
-    assign PE0_X1_in  = PE0_X1_i;
-    assign PE0_Y1_in  = PE0_Y1_i;
-
-    /*
-    always @(*) begin
-        PE0_angle_d0_in = angle0_reg;
-        PE0_angle_d1_in = angle1_reg;
-    end
-    */
-
-
-    always @(*) begin
-        PE0_angle_d0_in = angle0_i;
-        PE0_angle_d1_in = angle1_i;
-    end
-
-    assign PE1_idle   = ~PE1_valid_i;
-    assign PE1_scheme = PE1_scheme_i;
-    assign PE1_X0_in  = PE1_X0_i;
-    assign PE1_Y0_in  = PE1_Y0_i;
-    assign PE1_X1_in  = PE1_X1_i;
-    assign PE1_Y1_in  = PE1_Y1_i;
-
-    always @(*) begin
-        PE1_angle_d0_in = angle0_i;
-        PE1_angle_d1_in = angle1_i;
-    end
-
-    VEC_PE #(BITWIDTH,CORDIC_NUM) PE0(
-        .clk(clk),
-        .rst_n(rst_n),
-        .idle(PE0_idle),
-        .scheme(PE0_scheme), 
-
-        .X0_i(PE0_X0_in),
-        .Y0_i(PE0_Y0_in),
-        .X1_i(PE0_X1_in),
-        .Y1_i(PE0_Y1_in),
-        .angle_d0_i(PE0_angle_d0_in),
-        .angle_d1_i(PE0_angle_d1_in), 
-
-        .X0_o(PE0_X0_out),
-        .Y0_o(PE0_Y0_out),
-        .X1_o(PE0_X1_out),
-        .Y1_o(PE0_Y1_out)
-    );
-
-    VEC_PE #(BITWIDTH,CORDIC_NUM) PE1(
-        .clk(clk),
-        .rst_n(rst_n),
-        .idle(PE1_idle),
-        .scheme(PE1_scheme), 
-
-        .X0_i(PE1_X0_in),
-        .Y0_i(PE1_Y0_in),
-        .X1_i(PE1_X1_in),
-        .Y1_i(PE1_Y1_in),
-        .angle_d0_i(PE1_angle_d0_in),
-        .angle_d1_i(PE1_angle_d1_in), 
-
-        .X0_o(PE1_X0_out),
-        .Y0_o(PE1_Y0_out),
-        .X1_o(PE1_X1_out),
-        .Y1_o(PE1_Y1_out)
-    );
-
-
-endmodule
-
-module VEC_PE(
+module PE_R(
     clk,
     rst_n,
     idle,
@@ -263,7 +77,7 @@ module VEC_PE(
     assign X1_o = (isswap[PIPE_NUM-1])?  COR_Yout_0 : COR_Xout_1;
     assign Y1_o = COR_Yout_1;
 
-    VEC_CORDIC_VR #(BITWIDTH,CORDIC_NUM) CORDIC0(
+    CORDIC_R #(BITWIDTH,CORDIC_NUM) CORDIC0(
         .clk(clk),   
         .rst_n(rst_n),
         .start_i(COR_start_0),
@@ -274,7 +88,7 @@ module VEC_PE(
         .Y_o(COR_Yout_0)
     );
 
-    VEC_CORDIC_VR #(BITWIDTH,CORDIC_NUM) CORDIC1(
+    CORDIC_R #(BITWIDTH,CORDIC_NUM) CORDIC1(
         .clk(clk),   
         .rst_n(rst_n),
         .start_i(COR_start_1),
@@ -334,7 +148,7 @@ module VEC_PE(
 endmodule // PE
 
 
-module VEC_CORDIC_VR(
+module CORDIC_R(
     // Input
     clk,   
     rst_n,
