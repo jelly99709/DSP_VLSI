@@ -1,5 +1,5 @@
 `timescale 1ns/10ps
-`define CYCLE 10.0
+`define CYCLE 7.0
 `ifdef A
 	`define REAL_PAT "../../dat/4x4/patternR_a.dat"
 	`define IMAG_PAT "../../dat/4x4/patternI_a.dat"

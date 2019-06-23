@@ -1,6 +1,6 @@
 # You can only modify clock period 
 
-set cycle  10.0
+set cycle  5.0
 
 #don't modify the following part
 create_clock -period $cycle [get_ports  clk]
