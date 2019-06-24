@@ -1,5 +1,5 @@
 `timescale 1ns/10ps
-`define CYCLE 7.0
+`define CYCLE 8.0
 `ifdef A
 	`define REAL_PAT "../../dat/4x4/patternR_a.dat"
 	`define IMAG_PAT "../../dat/4x4/patternI_a.dat"
@@ -73,8 +73,13 @@ module x4_test;
 	`endif
 
 	initial begin
-		$fsdbDumpfile("./x4_test.fsdb");
-		$fsdbDumpvars(0, x4_test, "+mda");
+		`ifdef VCD
+			$dumpfile("../POWER/SVD.vcd");
+			$dumpvars();
+		`else
+			$fsdbDumpfile("./x4_test.fsdb");
+			$fsdbDumpvars(0, x4_test, "+mda");
+		`endif
 	end
 
 	initial begin

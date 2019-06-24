@@ -201,7 +201,7 @@ module CORDIC_VR(
     // Output
     X_o,
     Y_o,
-    d_o
+    d_o,
 );
     
     parameter BITWIDTH   = 18;
@@ -235,9 +235,6 @@ module CORDIC_VR(
     reg signed [BITWIDTH:0] X_tmp   [0:CORDIC_NUM-PIPE_NUM];
     reg signed [BITWIDTH:0] Y_tmp   [0:CORDIC_NUM-PIPE_NUM];
 
-    reg signed [BITWIDTH:0] X_mid   [0:CORDIC_NUM-1];
-    reg signed [BITWIDTH:0] Y_mid   [0:CORDIC_NUM-1];
-
     wire signed [15+BITWIDTH-1:0] scaling_X, scaling_Y;
 
     integer i;
@@ -256,118 +253,197 @@ module CORDIC_VR(
             mode_n[0] = ROTATE;
         end
 
-        if(((X_i[BITWIDTH-1] ^ Y_i[BITWIDTH-1]) & ~mode_i) | (d_i[0] & mode_i)) begin
-            X_mid[0] =  {X_i[BITWIDTH-1], X_i};
-            Y_mid[0] = ~{Y_i[BITWIDTH-1], Y_i} + 19'sd1;
-        end
-        else begin
-            X_mid[0] = ~{X_i[BITWIDTH-1], X_i} + 19'sd1;
-            Y_mid[0] =  {Y_i[BITWIDTH-1], Y_i};
-        end
+        case (mode_i)
+            VECTOR: begin
+                if(X_i[BITWIDTH-1] ^ Y_i[BITWIDTH-1]) begin
+                    X_tmp[0] = X_i - Y_i;
+                    Y_tmp[0] = Y_i + X_i;
+                end
+                else begin
+                    X_tmp[0] = X_i + Y_i;
+                    Y_tmp[0] = Y_i - X_i;
+                end
 
-        X_tmp[0] = {X_i[BITWIDTH-1], X_i} + Y_mid[0];
-        Y_tmp[0] = {Y_i[BITWIDTH-1], Y_i} + X_mid[0];
+                for(i=1;i<3;i=i+1) begin
+                    if(X_tmp[i-1][BITWIDTH] ^ Y_tmp[i-1][BITWIDTH]) begin
+                        X_tmp[i] = X_tmp[i-1] - (Y_tmp[i-1] >>> i);
+                        Y_tmp[i] = Y_tmp[i-1] + (X_tmp[i-1] >>> i);
+                    end
+                    else begin
+                        X_tmp[i] = X_tmp[i-1] + (Y_tmp[i-1] >>> i);
+                        Y_tmp[i] = Y_tmp[i-1] - (X_tmp[i-1] >>> i);
+                    end
+                end
 
-        for(i=1;i<3;i=i+1) begin
-            if(((X_tmp[i-1][BITWIDTH] ^ Y_tmp[i-1][BITWIDTH]) & ~mode_i) | (d_i[i] & mode_i)) begin
-                X_mid[i] =  (X_tmp[i-1] >>> i);
-                Y_mid[i] = ~(Y_tmp[i-1] >>> i) + 19'sd1;
+                if(X_tmp[2][BITWIDTH] ^ Y_tmp[2][BITWIDTH]) begin
+                    X_reg_n[0] = X_tmp[2] - (Y_tmp[2] >>> 3);
+                    Y_reg_n[0] = Y_tmp[2] + (X_tmp[2] >>> 3);
+                end
+                else begin
+                    X_reg_n[0] = X_tmp[2] + (Y_tmp[2] >>> 3);
+                    Y_reg_n[0] = Y_tmp[2] - (X_tmp[2] >>> 3);
+                end
             end
-            else begin
-                X_mid[i] = ~(X_tmp[i-1] >>> i) + 19'sd1;
-                Y_mid[i] =  (Y_tmp[i-1] >>> i);
+
+            ROTATE: begin
+                if(d_i[0]) begin
+                    X_tmp[0] = X_i - Y_i;
+                    Y_tmp[0] = Y_i + X_i;
+                end
+                else begin
+                    X_tmp[0] = X_i + Y_i;
+                    Y_tmp[0] = Y_i - X_i;
+                end
+
+                for(i=1;i<3;i=i+1) begin
+                    if(d_i[i]) begin
+                        X_tmp[i] = X_tmp[i-1] - (Y_tmp[i-1] >>> i);
+                        Y_tmp[i] = Y_tmp[i-1] + (X_tmp[i-1] >>> i);
+                    end
+                    else begin
+                        X_tmp[i] = X_tmp[i-1] + (Y_tmp[i-1] >>> i);
+                        Y_tmp[i] = Y_tmp[i-1] - (X_tmp[i-1] >>> i);
+                    end
+                end
+
+                if(d_i[3]) begin
+                    X_reg_n[0] = X_tmp[2] - (Y_tmp[2] >>> 3);
+                    Y_reg_n[0] = Y_tmp[2] + (X_tmp[2] >>> 3);
+                end
+                else begin
+                    X_reg_n[0] = X_tmp[2] + (Y_tmp[2] >>> 3);
+                    Y_reg_n[0] = Y_tmp[2] - (X_tmp[2] >>> 3);
+                end
             end
-            X_tmp[i] = X_tmp[i-1] + (Y_mid[i]);
-            Y_tmp[i] = Y_tmp[i-1] + (X_mid[i]);
-        end
+        endcase
 
 
-        if(((X_tmp[2][BITWIDTH] ^ Y_tmp[2][BITWIDTH]) & ~mode_i) | (d_i[3] & mode_i)) begin
-            X_mid[3] =  (X_tmp[2] >>> 3);
-            Y_mid[3] = ~(Y_tmp[2] >>> 3) + 19'sd1;
-        end
-        else begin
-            X_mid[3] = ~(X_tmp[2] >>> 3) + 19'sd1;
-            Y_mid[3] =  (Y_tmp[2] >>> 3);
-        end
+        case (mode[0])
+            VECTOR: begin
+                if(X_reg[0][BITWIDTH] ^ Y_reg[0][BITWIDTH]) begin
+                    X_tmp[3] = X_reg[0] - (Y_reg[0] >>> 4);
+                    Y_tmp[3] = Y_reg[0] + (X_reg[0] >>> 4);
+                end
+                else begin
+                    X_tmp[3] = X_reg[0] + (Y_reg[0] >>> 4);
+                    Y_tmp[3] = Y_reg[0] - (X_reg[0] >>> 4);
+                end
 
-        X_reg_n[0] = X_tmp[2] + (Y_mid[3]);
-        Y_reg_n[0] = Y_tmp[2] + (X_mid[3]);
+                for(i=4;i<7;i=i+1) begin
+                    if(X_tmp[i-1][BITWIDTH] ^ Y_tmp[i-1][BITWIDTH]) begin
+                        X_tmp[i] = X_tmp[i-1] - (Y_tmp[i-1] >>> i+1);
+                        Y_tmp[i] = Y_tmp[i-1] + (X_tmp[i-1] >>> i+1);
+                    end
+                    else begin
+                        X_tmp[i] = X_tmp[i-1] + (Y_tmp[i-1] >>> i+1);
+                        Y_tmp[i] = Y_tmp[i-1] - (X_tmp[i-1] >>> i+1);
+                    end
+                end
 
-
-        if(((X_reg[0][BITWIDTH] ^ Y_reg[0][BITWIDTH]) & ~mode[0]) | (d_i[4] & mode[0])) begin
-            X_mid[4] =  (X_reg[0] >>> 4);
-            Y_mid[4] = ~(Y_reg[0] >>> 4) + 19'sd1;
-        end
-        else begin
-            X_mid[4] = ~(X_reg[0] >>> 4) + 19'sd1;
-            Y_mid[4] =  (Y_reg[0] >>> 4);
-        end
-
-        X_tmp[3] = X_reg[0] + (Y_mid[4]);
-        Y_tmp[3] = Y_reg[0] + (X_mid[4]);
-
-        for(i=4;i<7;i=i+1) begin
-            if(((X_tmp[i-1][BITWIDTH] ^ Y_tmp[i-1][BITWIDTH]) & ~mode[0]) | (d_i[i+1] & mode[0])) begin
-                X_mid[i+1] = (X_tmp[i-1] >>> i+1);
-                Y_mid[i+1] = ~(Y_tmp[i-1] >>> i+1) + 19'sd1;
+                if(X_tmp[6][BITWIDTH] ^ Y_tmp[6][BITWIDTH]) begin
+                    X_reg_n[1] = X_tmp[6] - (Y_tmp[6] >>> 8);
+                    Y_reg_n[1] = Y_tmp[6] + (X_tmp[6] >>> 8);
+                end
+                else begin
+                    X_reg_n[1] = X_tmp[6] + (Y_tmp[6] >>> 8);
+                    Y_reg_n[1] = Y_tmp[6] - (X_tmp[6] >>> 8);
+                end
             end
-            else begin
-                X_mid[i+1] = ~(X_tmp[i-1] >>> i+1) + 19'sd1;
-                Y_mid[i+1] = (Y_tmp[i-1] >>> i+1);
+
+            ROTATE: begin
+                if(d_i[4]) begin
+                    X_tmp[3] = X_reg[0] - (Y_reg[0] >>> 4);
+                    Y_tmp[3] = Y_reg[0] + (X_reg[0] >>> 4);
+                end
+                else begin
+                    X_tmp[3] = X_reg[0] + (Y_reg[0] >>> 4);
+                    Y_tmp[3] = Y_reg[0] - (X_reg[0] >>> 4);
+                end
+
+                for(i=4;i<7;i=i+1) begin
+                    if(d_i[i+1]) begin
+                        X_tmp[i] = X_tmp[i-1] - (Y_tmp[i-1] >>> i+1);
+                        Y_tmp[i] = Y_tmp[i-1] + (X_tmp[i-1] >>> i+1);
+                    end
+                    else begin
+                        X_tmp[i] = X_tmp[i-1] + (Y_tmp[i-1] >>> i+1);
+                        Y_tmp[i] = Y_tmp[i-1] - (X_tmp[i-1] >>> i+1);
+                    end
+                end
+
+                if(d_i[8]) begin
+                    X_reg_n[1] = X_tmp[6] - (Y_tmp[6] >>> 8);
+                    Y_reg_n[1] = Y_tmp[6] + (X_tmp[6] >>> 8);
+                end
+                else begin
+                    X_reg_n[1] = X_tmp[6] + (Y_tmp[6] >>> 8);
+                    Y_reg_n[1] = Y_tmp[6] - (X_tmp[6] >>> 8);
+                end
             end
-            X_tmp[i] = X_tmp[i-1] + (Y_mid[i+1]);
-            Y_tmp[i] = Y_tmp[i-1] + (X_mid[i+1]);
-        end
+        endcase
 
-        if(((X_tmp[6][BITWIDTH] ^ Y_tmp[6][BITWIDTH]) & ~mode[0]) | (d_i[8] & mode[0])) begin
-            X_mid[8] =  (X_tmp[6] >>> 8);
-            Y_mid[8] = ~(Y_tmp[6] >>> 8) + 19'sd1;
-        end
-        else begin
-            X_mid[8] = ~(X_tmp[6] >>> 8) + 19'sd1;
-            Y_mid[8] =  (Y_tmp[6] >>> 8);
-        end
+        case (mode[1])
+            VECTOR: begin
+                if(X_reg[1][BITWIDTH] ^ Y_reg[1][BITWIDTH]) begin
+                    X_tmp[7] = X_reg[1] - (Y_reg[1] >>> 9);
+                    Y_tmp[7] = Y_reg[1] + (X_reg[1] >>> 9);
+                end
+                else begin
+                    X_tmp[7] = X_reg[1] + (Y_reg[1] >>> 9);
+                    Y_tmp[7] = Y_reg[1] - (X_reg[1] >>> 9);
+                end
 
-        X_reg_n[1] = X_tmp[6] + (Y_mid[8]);
-        Y_reg_n[1] = Y_tmp[6] + (X_mid[8]);
+                for(i=8;i<11;i=i+1) begin
+                    if(X_tmp[i-1][BITWIDTH] ^ Y_tmp[i-1][BITWIDTH]) begin
+                        X_tmp[i] = X_tmp[i-1] - (Y_tmp[i-1] >>> i+2);
+                        Y_tmp[i] = Y_tmp[i-1] + (X_tmp[i-1] >>> i+2);
+                    end
+                    else begin
+                        X_tmp[i] = X_tmp[i-1] + (Y_tmp[i-1] >>> i+2);
+                        Y_tmp[i] = Y_tmp[i-1] - (X_tmp[i-1] >>> i+2);
+                    end
+                end
 
-        if(((X_reg[1][BITWIDTH] ^ Y_reg[1][BITWIDTH]) & ~mode[1]) | (d_i[9] & mode[1])) begin
-            X_mid[9] =  (X_reg[1] >>> 9);
-            Y_mid[9] = ~(Y_reg[1] >>> 9) + 19'sd1;
-        end
-        else begin
-            X_mid[9] = ~(X_reg[1] >>> 9) + 19'sd1;
-            Y_mid[9] =  (Y_reg[1] >>> 9);
-        end
-
-        X_tmp[7] = X_reg[1] + (Y_mid[9]);
-        Y_tmp[7] = Y_reg[1] + (X_mid[9]);
-
-        for(i=8;i<11;i=i+1) begin
-            if(((X_tmp[i-1][BITWIDTH] ^ Y_tmp[i-1][BITWIDTH]) & ~mode[1]) | (d_i[i+2] & mode[1])) begin
-                X_mid[i+2] =  (X_tmp[i-1] >>> i+2);
-                Y_mid[i+2] = ~(Y_tmp[i-1] >>> i+2) + 19'sd1;
+                if(X_tmp[10][BITWIDTH] ^ Y_tmp[10][BITWIDTH]) begin
+                    X_reg_n[2] = X_tmp[10] - (Y_tmp[10] >>> 13);
+                    Y_reg_n[2] = Y_tmp[10] + (X_tmp[10] >>> 13);
+                end
+                else begin
+                    X_reg_n[2] = X_tmp[10] + (Y_tmp[10] >>> 13);
+                    Y_reg_n[2] = Y_tmp[10] - (X_tmp[10] >>> 13);
+                end
             end
-            else begin
-                X_mid[i+2] = ~(X_tmp[i-1] >>> i+2) + 19'sd1;
-                Y_mid[i+2] =  (Y_tmp[i-1] >>> i+2);
+            ROTATE: begin
+                if(d_i[9]) begin
+                    X_tmp[7] = X_reg[1] - (Y_reg[1] >>> 9);
+                    Y_tmp[7] = Y_reg[1] + (X_reg[1] >>> 9);
+                end
+                else begin
+                    X_tmp[7] = X_reg[1] + (Y_reg[1] >>> 9);
+                    Y_tmp[7] = Y_reg[1] - (X_reg[1] >>> 9);
+                end
+
+                for(i=8;i<11;i=i+1) begin
+                    if(d_i[i+2]) begin
+                        X_tmp[i] = X_tmp[i-1] - (Y_tmp[i-1] >>> i+2);
+                        Y_tmp[i] = Y_tmp[i-1] + (X_tmp[i-1] >>> i+2);
+                    end
+                    else begin
+                        X_tmp[i] = X_tmp[i-1] + (Y_tmp[i-1] >>> i+2);
+                        Y_tmp[i] = Y_tmp[i-1] - (X_tmp[i-1] >>> i+2);
+                    end
+                end
+
+                if(d_i[13]) begin
+                    X_reg_n[2] = X_tmp[10] - (Y_tmp[10] >>> 13);
+                    Y_reg_n[2] = Y_tmp[10] + (X_tmp[10] >>> 13);
+                end
+                else begin
+                    X_reg_n[2] = X_tmp[10] + (Y_tmp[10] >>> 13);
+                    Y_reg_n[2] = Y_tmp[10] - (X_tmp[10] >>> 13);
+                end
             end
-            X_tmp[i] = X_tmp[i-1] + (Y_mid[i+2]);
-            Y_tmp[i] = Y_tmp[i-1] + (X_mid[i+2]);
-        end
-
-        if(((X_tmp[10][BITWIDTH] ^ Y_tmp[10][BITWIDTH]) & ~mode[1]) | (d_i[13] & mode[1])) begin
-            X_mid[13] =  (X_tmp[10] >>> 13);
-            Y_mid[13] = ~(Y_tmp[10] >>> 13) + 19'sd1;
-        end
-        else begin
-            X_mid[13] = ~(X_tmp[10] >>> 13) + 19'sd1;
-            Y_mid[13] =  (Y_tmp[10] >>> 13);
-        end
-
-        X_reg_n[2] = X_tmp[10] + (Y_mid[13]);
-        Y_reg_n[2] = Y_tmp[10] + (X_mid[13]);
+        endcase
 
         for(i=1;i<PIPE_NUM-2;i=i+1) begin
             mode_n[i] = mode[i-1];
