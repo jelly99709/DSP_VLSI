@@ -43,7 +43,7 @@ read_sdf -load_delay net ../SYN/netlist/SVD_syn.sdf
 #======================================================
 #  4. Read Switching Activity File
 #======================================================
-read_vcd -strip_path x4test/x4 ./SVD.vcd
+read_vcd -strip_path x4_test/x4 ./SVD.vcd
 
 #======================================================
 #  5. Perform power analysis
